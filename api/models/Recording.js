@@ -5,16 +5,26 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var path = require("path");
+var fs   = require("fs");
+
 var FILE_EXTENSION = 'mp4'; // Only accepted file format
 var RAND_RANGE = 10e3; // Range for random number value attached to each filename
 
 module.exports = {
 	// Unique name for this model
+	"types": {
+		"is_start_time": function (startTime) {
+			// Check that startTime is in fact before endTime
+			return startTime < this.endTime;
+		}
+	},
 	"identity": 'recording',
 	"attributes": {
 		"startTime": {
 			"type": 'date',
-			"required": true
+			"required": true,
+			"is_start_time": true
 		},
 		"endTime": {
 			"type": 'date',
@@ -22,7 +32,7 @@ module.exports = {
 		},
 		"filename": {
 			"type": 'string',
-			"required": false,
+			"required": true,
 			"unique": true
 		}
 	},
@@ -51,6 +61,26 @@ module.exports = {
 		// Call the callback in the future to maintain caller consistency
 		process.nextTick(function () {
 			cb();
+		});
+	},
+
+	// After deletion, delete the video files corresponding to each recording
+	afterDestroy: function(destroyedRecords, cb) {
+		// Extract video filenames from records
+		var vidsDir = path.resolve("./assets/videos");
+		
+		var filepaths = destroyedRecords.map(function (record) {
+			return path.join(vidsDir, record.filename);
+		});
+
+		// First check which of the files are existent
+		async.filter(filepaths, fs.exists, function (filesToDelete) {
+			// Then delete the ones that do exist
+			async.each(filesToDelete, fs.unlink, function (err) {
+				if (err)
+					sails.log(err);
+				cb();
+			});
 		});
 	}
 };
