@@ -43,11 +43,11 @@ module.exports = {
 			/**
 			 * Example of uploadedFile (element of uploadedFiles array):
 			 * {
-			 * 		fd: "/Users/sourabhdesai/Documents/Node Projects/ClassCapture/assets/videos/jmarr_dashboard.mp4"
-			 * 		size: 1387084
-			 * 		type: "video/mp4"
-			 * 		filename: "Johnny Marr plays Dashboard by Modest Mouse.mp4"
-			 * 		status: "bufferingOrWriting"
+			 * 		fd: "/Users/sourabhdesai/Documents/Node Projects/ClassCapture/assets/videos/jmarr_dashboard.mp4",
+			 * 		size: 1387084,
+			 * 		type: "video/mp4",
+			 * 		filename: "Johnny Marr plays Dashboard by Modest Mouse.mp4",
+			 * 		status: "bufferingOrWriting",
 			 * 		field: "video"
 			 * }
 			 */
@@ -74,6 +74,24 @@ module.exports = {
 						sails.log(err);
 				});
 			}
+		});
+	},
+
+	/**
+	 * Handles all GET requests to /getVideo/:videoname
+	 * Video to send out is in :videoname URL parameter.
+	 */
+	getVideo: function (req, res) {
+		var videoname = req.param("videoname");
+
+		var opts = {
+			"root": "./assets/videos"
+		};
+
+		// Internally takes care of setting Content-Type
+		res.sendfile(videoname, opts, function (err) {
+			if (err)
+				res.negotiate(err);
 		});
 	}
 };
