@@ -9,14 +9,16 @@ var path = require("path");
 var fs   = require('fs');
 
 var MAX_FILE_SIZE = 500e6; // in bytes. 500 MB
+var VIDEOS_DIR = './assets/videos'; // directories to store videos in
 
 // get extension for a given filename. Returns null if doesn't have an extension
 function getFileExtension(filename) {
 	var extensionIdx = filename.lastIndexOf(".");
-	
-	if (extensionIdx <= 0)
+
+	if (extensionIdx <= 0) {
 		return null;
-	
+	}
+
 	var extension = filename.substring(extensionIdx + 1);
 	
 	return extension;
@@ -29,16 +31,17 @@ module.exports = {
 	 * Video content from header will be stored in ./assets/videos/{videoname}
 	 */
 	postVideo: function (req, res) {
-		var videoname = req.param('videoname');
-		
+		var videoName = req.param('videoname');
+
 		// File will be in header key 'video'
 		req.file("video").upload({
-			"dirname": path.resolve('./assets/videos'),
-			"saveAs": videoname,
+			"dirname": path.resolve(VIDEOS_DIR),
+			"saveAs": videoName,
 			"maxBytes": MAX_FILE_SIZE // file upload limit
 		}, function (err, uploadedFiles) {
-			if (err)
+			if (err) {
 				return res.negotiate(err);
+			}
 
 			/**
 			 * Example of uploadedFile (element of uploadedFiles array):
@@ -57,10 +60,10 @@ module.exports = {
 			var fileExtension = getFileExtension(uploadedFile.filename);
 
 			// Check that the file is in fact an mp4 video file
-			if (uploadedFile.type == 'video/mp4' || fileExtension == 'mp4') {
+			if (uploadedFile.type === 'video/mp4' || fileExtension === 'mp4') {
 				// On success, will just display the uploadedFile's metadata
 				res.json({
-					"videoname": videoname,
+					"videoname": videoName,
 					"size": uploadedFile.size, // In bytes
 					"type": uploadedFile.type
 				});
@@ -82,17 +85,17 @@ module.exports = {
 	 * Video to send out is in :videoname URL parameter.
 	 */
 	getVideo: function (req, res) {
-		var videoname = req.param("videoname");
+		var videoName = req.param("videoname");
 
 		var opts = {
 			"root": "./assets/videos"
 		};
 
 		// Internally takes care of setting Content-Type
-		res.sendfile(videoname, opts, function (err) {
-			if (err)
+		res.sendfile(videoName, opts, function (err) {
+			if (err) {
 				res.negotiate(err);
+			}
 		});
 	}
 };
-

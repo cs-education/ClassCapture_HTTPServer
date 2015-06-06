@@ -109,9 +109,3 @@ describe("Test basic CRUD Ops in that order", function () {
 		});
 	});
 });
-
-/**
- * TODO: Write Tests for Queries
- */
-
- 
