@@ -9,7 +9,6 @@ var path = require("path");
 var fs   = require('fs');
 
 var MAX_FILE_SIZE = 500e6; // in bytes. 500 MB
-var VIDEOS_DIR = './assets/videos'; // directories to store videos in
 
 // get extension for a given filename. Returns null if doesn't have an extension
 function getFileExtension(filename) {
@@ -35,7 +34,7 @@ module.exports = {
 
 		// File will be in header key 'video'
 		req.file("video").upload({
-			"dirname": path.resolve(VIDEOS_DIR),
+			"dirname": RecordingService.SAVED_VIDEOS_DIR,
 			"saveAs": videoName,
 			"maxBytes": MAX_FILE_SIZE // file upload limit
 		}, function (err, uploadedFiles) {
@@ -88,7 +87,7 @@ module.exports = {
 		var videoName = req.param("videoname");
 
 		var opts = {
-			"root": "./assets/videos"
+			"root": RecordingService.SAVED_VIDEOS_DIR
 		};
 
 		// Internally takes care of setting Content-Type

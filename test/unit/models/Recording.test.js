@@ -16,21 +16,23 @@ var assert = chai.assert;
 var expect = chai.expect;
 var should = chai.should();
 
-// Return array of two dates, sequenced chronologically
+// Return object with two dates, named chronologically
 function getDates() {
 	var currDate = new Date();
 	var year = currDate.getFullYear();
 	var futureDate = new Date();
 	futureDate.setYear(year + 1); // 1 Year into the future.
 
-	return [currDate, futureDate];
+	return {
+		"start": currDate,
+		"end": futureDate
+	};
 }
 
 function datesEqual(dateA, dateB) {
 	// Turns out == or === doesn't work when comparing two different date instances with the same value.
 	// Despite that, the >,<,>=,<= operators work as expected (chronologically compare)
-	// This should do the trick to see if two dates are equal.
-	return (dateA >= dateB) && (dateA <= dateB);
+	return dateA.getTime() == dateB.getTime();
 }
 
 describe("Test basic CRUD Ops in that order", function () {
@@ -39,13 +41,13 @@ describe("Test basic CRUD Ops in that order", function () {
 	describe("create", function () {
 		it("Should create a new recording entry", function (done) {
 			var dates = getDates();
-			assert.isBelow(dates[0], dates[1], "startTime is not below endTime");
+			assert.isBelow(dates.start, dates.end, "startTime is not below endTime");
 
 			request(sails.hooks.http.app)
 				.post('/recording/create')
 				.send({
-					"startTime": dates[0],
-					"endTime": dates[1]
+					"startTime": dates.start,
+					"endTime": dates.end
 				})
 				.expect(function (res) {
 					// Check for valid response
@@ -54,8 +56,8 @@ describe("Test basic CRUD Ops in that order", function () {
 					res.body.should.have.property("filename");
 					res.body.should.have.property("id");
 					recordingBody = res.body; // To be used as reference in future tests
-					assert.isTrue(datesEqual(dates[0], new Date(res.body.startTime)), "Received startTime not consistent with given startTime");
-					assert.isTrue(datesEqual(dates[1], new Date(res.body.endTime)), "Received endTime not consistent with given endTime");
+					assert.isTrue(datesEqual(dates.start, new Date(res.body.startTime)), "Received startTime not consistent with given startTime");
+					assert.isTrue(datesEqual(dates.end, new Date(res.body.endTime)), "Received endTime not consistent with given endTime");
 				})
 				.expect(201, done);
 		});
@@ -66,8 +68,8 @@ describe("Test basic CRUD Ops in that order", function () {
 			request(sails.hooks.http.app)
 				.get("/recording/" + recordingBody.id)
 				.expect(function (res) {
-					// Loop through each attribute in the body of the create response
-					// and make sure it matches with the body of the read respobse
+					// Loop through each attribute in the body of the created response
+					// and make sure it matches with the body of the read response
 					Object.keys(recordingBody).forEach(function (attr) {
 						res.body.should.have.property(attr);
 						assert.equal(recordingBody[attr], res.body[attr], "Attribute for " + attr + " didn't match");
