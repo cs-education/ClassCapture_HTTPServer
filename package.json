@@ -21,11 +21,13 @@
     "include-all": "~0.1.3",
     "rc": "~0.5.0",
     "sails": "~0.11.0",
-    "sails-disk": "~0.10.0"
+    "sails-disk": "~0.10.0",
+    "skipper": "^0.5.5"
   },
   "scripts": {
     "debug": "node debug app.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js"
   },
   "main": "app.js",
   "repository": {
@@ -33,5 +35,9 @@
     "url": "git://github.com/sourabhdesai/ClassCapture.git"
   },
   "author": "sourabhdesai",
-  "license": ""
+  "license": "",
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "supertest": "^1.0.1"
+  }
 }
