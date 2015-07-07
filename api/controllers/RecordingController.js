@@ -25,11 +25,11 @@ function getFileExtension(filename) {
 
 module.exports = {
 	/**
-	 * Handles all POST requests to /postVideo/:videoname
+	 * Handles all POST/PUT requests to /postVideo/:videoname
 	 * Request header should contain key-value pair of 'video': <video content>
 	 * Video content from header will be stored in ./assets/videos/{videoname}
 	 */
-	postVideo: function (req, res) {
+	uploadVideo: function (req, res) {
 		var videoName = req.param('videoname');
 
 		// File will be in header key 'video'
