@@ -24,7 +24,7 @@ describe("Test Uploading and Downloading of Video", function () {
 	describe("Test Uploading of Video", function () {
 		it("Should successfully upload the video to the server", function (done) {
 			request(sails.hooks.http.app)
-				.post("/postVideo/jmarr-cpy.mp4")
+				.post("/video/jmarr-cpy.mp4")
 				.attach("video", VIDEO_FILE)
 				.expect(200, done);
 		});
@@ -33,7 +33,7 @@ describe("Test Uploading and Downloading of Video", function () {
 	describe("Test Uploading of Video", function () {
 		it("Should successfully download the video from the server", function (done) {
 			request(sails.hooks.http.app)
-				.get("/getVideo/jmarr-cpy.mp4")
+				.get("/video/jmarr-cpy.mp4")
 				.expect(function (res) {
 					var stats    = fs.statSync(VIDEO_FILE);
 					var fileSize = stats.size;
