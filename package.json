@@ -25,8 +25,8 @@
     "skipper": "^0.5.5"
   },
   "scripts": {
-    "debug": "node debug app.js",
-    "start": "node app.js",
+    "debug": "node-debug app.js",
+    "start": "forever start app.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js"
   },
   "main": "app.js",
