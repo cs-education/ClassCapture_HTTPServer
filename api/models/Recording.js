@@ -1,7 +1,7 @@
 /**
 * Recording.js
 *
-* @description :: Model that contains metadata for a recording as well as path to video stored on disk
+* @description :: Schema that contains metadata for a recording as well as path to video stored on disk
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
@@ -9,9 +9,8 @@ var path = require("path");
 var fs   = require("fs");
 
 module.exports = {
-	// Unique name for this model
 	"types": {
-		"is_start_time": function () {
+		"isChronological": function () {
 			// Check that startTime is in fact before endTime
 			return this.startTime < this.endTime;
 		}
@@ -19,16 +18,17 @@ module.exports = {
 	"identity": 'recording',
 	"attributes": {
 		"startTime": {
-			"type": 'date',
+			"type": "date",
 			"required": true,
-			"is_start_time": true
+			"isChronological": true
 		},
 		"endTime": {
-			"type": 'date',
-			"required": true
+			"type": "date",
+			"required": true,
+			"isChronological": true
 		},
 		"filename": {
-			"type": 'string',
+			"type": "string",
 			"required": true,
 			"unique": true
 		}
