@@ -20,6 +20,7 @@ module.exports = {
 	},
 	"attributes": {
 		// Timing
+		// Dont want start and end times to be required attributes since some course sections do not have hard set timings (e.g. Independent Study courses).
 		"startTime": {
 			"type": "date",
 			"isStartEndPaired": true,
