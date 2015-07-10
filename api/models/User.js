@@ -12,7 +12,7 @@
 const UIUC_EMAIL_SUFFIX = "@illinois.edu";
 
 // List of possible semester seasons
-const SEMESTER_SEASONS = ["fall", "spring", "summer"];
+const SEMESTER_SEASONS = ["FA", "SP", "SU"]; // fall, spring, & summer
 
 const YEAR_UPPER_BOUND = 2050;
 const YEAR_LOWER_BOUND = 1950;
