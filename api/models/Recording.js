@@ -12,7 +12,9 @@ module.exports = {
 	"types": {
 		"isChronological": function () {
 			// Check that startTime is in fact before endTime
-			return this.startTime < this.endTime;
+			// return this.startTime < this.endTime;
+			consol.log('this:\n' + JSON.stringify(this, null, 2));
+			return typeof this.startTime === 'date' && typeof this.endTime === 'date';
 		}
 	},
 	"identity": 'recording',
@@ -29,19 +31,26 @@ module.exports = {
 		},
 		"filename": {
 			"type": "string",
-			"required": true,
 			"unique": true
+		},
+		"section": {
+			"model": "Section",
+			"required": true
 		}
 	},
 
 	// Lifecycle callbacks (more info: http://sailsjs.org/#!/documentation/concepts/ORM/Lifecyclecallbacks.html)
-	// Before validation, create the filename with the given startTime and endTime.
-	// Also use current timestamp and a random value to make filename unique
-	beforeValidate: function (values, cb) {		
-		// Set the filename of the values object to the one generated
-		values.filename = RecordingService.generateRecordingTitle(values);
-		
+	beforeUpdate: function (values, cb) {
+		console.log('typeof values.startTime: ' + typeof values.startTime);
+		console.log('typeof values.endTime: ' + typeof values.endTime);
 		// Call the callback in the future to maintain caller consistency
+		process.nextTick(cb);
+	},
+
+	beforeCreate: function (values, cb) {
+		// Before creation, create the filename with the given startTime and endTime.
+		values.filename = RecordingService.generateRecordingTitle(values);
+
 		process.nextTick(cb);
 	},
 
