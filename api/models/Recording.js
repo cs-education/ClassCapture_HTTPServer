@@ -10,11 +10,13 @@ var fs   = require("fs");
 
 module.exports = {
 	"types": {
-		"isChronological": function () {
+		"isStartTime": function () {
 			// Check that startTime is in fact before endTime
-			// return this.startTime < this.endTime;
-			consol.log('this:\n' + JSON.stringify(this, null, 2));
-			return typeof this.startTime === 'date' && typeof this.endTime === 'date';
+			if (_.has(this, 'startTime') && _.has(this, 'endTime')) {
+				return this.startTime < this.endTime;
+			}
+			// Don't have enough info to make this validaiton...may only be updating either start or end time
+			return true;
 		}
 	},
 	"identity": 'recording',
@@ -22,12 +24,11 @@ module.exports = {
 		"startTime": {
 			"type": "date",
 			"required": true,
-			"isChronological": true
+			"isStartTime": true
 		},
 		"endTime": {
 			"type": "date",
-			"required": true,
-			"isChronological": true
+			"required": true
 		},
 		"filename": {
 			"type": "string",
