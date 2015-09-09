@@ -6,11 +6,11 @@ This is a [Sails](http://sailsjs.org) application.
 
 There are a whole host of reasons for choosing SailsJS
 
-	* [API Model Scaffolding](https://youtu.be/GK-tFvpIR7c?t=1m35s)
-	* [Real time Pub Sub to API backend](https://youtu.be/GK-tFvpIR7c?t=5m20s) via [Socket.IO](http://socket.io/)
-	* Built on top of solid, mature middleware like [Express](http://expressjs.com/) and [Socket.IO](http://socket.io/)
-	* Promotes modularized project structure with Models/Controllers/Services
-	* Wraps Model interaction with the *database agnostic* ORM [Waterline](https://github.com/balderdashy/waterline)
+- [API Model Scaffolding](https://youtu.be/GK-tFvpIR7c?t=1m35s)
+- [Real time Pub Sub to API backend](https://youtu.be/GK-tFvpIR7c?t=5m20s) via [Socket.IO](http://socket.io/)
+- Built on top of solid, mature middleware like [Express](http://expressjs.com/) and [Socket.IO](http://socket.io/)
+- Promotes modularized project structure with Models/Controllers/Services
+- Wraps Model interaction with the *database agnostic* ORM [Waterline](https://github.com/balderdashy/waterline)
 	
 ## Schemas
 All database models are stored in the `api/models/` directory.
