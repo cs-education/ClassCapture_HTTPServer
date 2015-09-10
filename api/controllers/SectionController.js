@@ -1,7 +1,7 @@
 /**
- * RecordingController
+ * SectionController
  *
- * @description :: Server-side logic for managing Recordings
+ * @description :: Server-side logic for managing Sections
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
