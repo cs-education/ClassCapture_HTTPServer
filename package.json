@@ -28,7 +28,7 @@
   },
   "scripts": {
     "debug": "node-debug app.js",
-    "start": "forever start app.js",
+    "start": "node app.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js"
   },
   "main": "app.js",
