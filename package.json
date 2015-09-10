@@ -41,5 +41,8 @@
   "devDependencies": {
     "chai": "^2.3.0",
     "supertest": "^1.0.1"
+  },
+  "engines": {
+    "node": "*"
   }
 }
