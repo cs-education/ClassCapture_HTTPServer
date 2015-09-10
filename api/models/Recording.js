@@ -22,12 +22,12 @@ module.exports = {
 	"identity": 'recording',
 	"attributes": {
 		"startTime": {
-			"type": "date",
+			"type": "datetime",
 			"required": true,
 			"isStartTime": true
 		},
 		"endTime": {
-			"type": "date",
+			"type": "datetime",
 			"required": true
 		},
 		"filename": {
@@ -41,13 +41,6 @@ module.exports = {
 	},
 
 	// Lifecycle callbacks (more info: http://sailsjs.org/#!/documentation/concepts/ORM/Lifecyclecallbacks.html)
-	beforeUpdate: function (values, cb) {
-		console.log('typeof values.startTime: ' + typeof values.startTime);
-		console.log('typeof values.endTime: ' + typeof values.endTime);
-		// Call the callback in the future to maintain caller consistency
-		process.nextTick(cb);
-	},
-
 	beforeCreate: function (values, cb) {
 		// Before creation, create the filename with the given startTime and endTime.
 		values.filename = RecordingService.generateRecordingTitle(values);
@@ -58,9 +51,9 @@ module.exports = {
 	// After deletion, delete the video files corresponding to each recording
 	afterDestroy: function(destroyedRecords, cb) {
 		// Delete the video files for the recordings
-		async.each(destroyedRecords, RecordingService.deleteFileForRecording, function (err) {
+		async.each(destroyedRecords, VideoService.deleteVideoForRecording, function (err) {
 			if (err) {
-				sails.log(err);
+				sails.log.info(err);
 			}
 			cb();
 		});

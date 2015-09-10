@@ -51,6 +51,10 @@ describe("Test basic CRUD Ops in that order", function () {
 				})
 				.expect(function (res) {
 					courseBody = res.body;
+					courseBody.should.have.property('department');
+					courseBody.department.should.equal("CS");
+					courseBody.should.have.property('number');
+					courseBody.number.should.equal(225);
 				})
 				.expect(201, done);
 		});
@@ -66,6 +70,10 @@ describe("Test basic CRUD Ops in that order", function () {
 				})
 				.expect(res => {
 					sectionBody = res.body;
+					sectionBody.should.have.property('name');
+					sectionBody.name.should.equal("AL1");
+					sectionBody.should.have.property('course');
+					sectionBody.course.should.equal(courseBody.id);
 				})
 				.expect(201, done);
 		});
@@ -77,7 +85,7 @@ describe("Test basic CRUD Ops in that order", function () {
 			assert.isBelow(dates.start, dates.end, "startTime is not below endTime");
 
 			request(sails.hooks.http.app)
-				.post('/recording/create')
+				.post('/recording/')
 				.send({
 					"startTime": dates.start,
 					"endTime": dates.end,
@@ -100,7 +108,7 @@ describe("Test basic CRUD Ops in that order", function () {
 	describe("read", function () {
 		it("Should grab the record that was just created and check that it hasn't changed", done => {
 			request(sails.hooks.http.app)
-				.get("/recording/" + recordingBody.id)
+				.get(`/recording/${recordingBody.id}`)
 				.expect(res => {
 					// Loop through each attribute in the body of the created response
 					// and make sure it matches with the body of the read response
@@ -122,32 +130,24 @@ describe("Test basic CRUD Ops in that order", function () {
 			// Advance the year of the record's endTime by 1 year
 			var newEndTime = new Date(recordingBody.endTime);
 			newEndTime.setYear(newEndTime.getFullYear() + 1); // increment year
-			console.log('isChrono: ' + recordingBody.startTime < newEndTime);
+
 			request(sails.hooks.http.app)
-				.post("/recording/" + recordingBody.id)
+				.put("/recording/" + recordingBody.id)
 				.send({
 					"endTime": newEndTime
 				})
 				.expect(res => {
-					console.log('res.body:\n' + JSON.stringify(res.body));
 					res.body.should.have.property("endTime");
 					assert.isTrue(datesEqual(newEndTime, new Date(res.body.endTime)), "Endtime for Recording wasn't updated as expected");
 				})
-				// .expect(200, err => {
-				// 	console.log(JSON.stringify(err, null, 2));
-				// 	done(err);
-				// })
-				.end((err, res) => {
-					console.log('err:\n' + JSON.stringify(err, null, 2));
-					console.log('res:\n' + JSON.stringify(res, null, 2));
+				.expect(200, err => {
 					done(err);
-				});
+				})
 		});
 	});
 
 	describe("delete", function () {
 		it("Should delete the record that was just updated", done => {
-			console.log(JSON.stringify(recordingBody));
 			request(sails.hooks.http.app)
 				.del("/recording/" + recordingBody.id)
 				.expect(res => {
@@ -155,6 +155,12 @@ describe("Test basic CRUD Ops in that order", function () {
 					assert.equal(res.body.id, recordingBody.id, "ID's didn't match up");
 				})
 				.expect(200, done);
+		});
+
+		it('Should get a Not Found response when trying to fetch the recording that was just deleted', done => {
+			request(sails.hooks.http.app)
+				.get(`/recording/${recordingBody.id}`)
+				.expect(404, done);
 		});
 	});
 });

@@ -46,8 +46,9 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  'post /video/:videoname': 'RecordingController.uploadVideo',
-  'put /video/:videoname': 'RecordingController.uploadVideo',
-  'get /video/:videoname': 'RecordingController.getVideo'
+  'post /video/:videoname': 'VideoController.uploadVideo',
+  'put /video/:videoname': 'VideoController.uploadVideo',
+  'get /video/:videoname': 'VideoController.getVideo',
+  'delete /video/:videoname': 'VideoController.deleteVideo'
 
 };

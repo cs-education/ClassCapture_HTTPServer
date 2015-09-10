@@ -13,7 +13,7 @@ module.exports = {
 			// Can only have startTime attr if there is also an endTime attr
 			return _.has(this, "startTime") && _.has(this, "endTime");
 		},
-		"isChronological": function () {
+		"isStartTime": function () {
 			// Check that startTime is in fact before endTime
 			return this.startTime < this.endTime;
 		}
@@ -22,14 +22,13 @@ module.exports = {
 		// Timing
 		// Dont want start and end times to be required attributes since some course sections do not have hard set timings (e.g. Independent Study courses).
 		"startTime": {
-			"type": "date",
+			"type": "datetime",
 			"isStartEndPaired": true,
-			"isChronological": true
+			"isStartTime": true
 		},
 		"endTime": {
-			"type": "date",
-			"isStartEndPaired": true,
-			"isChronological": true
+			"type": "datetime",
+			"isStartEndPaired": true
 		},
 		// Common example of section name: "AL1"
 		"name": {

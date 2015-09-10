@@ -27,8 +27,7 @@ module.exports = {
 		},
 		"sections": { // Example: CS 225 may have 2 lecture sections, 5 lab sections, & 5 discussion sections
 			"collection": "Section",
-			"via": "course",
-			"defaultsTo": []
+			"via": "course"
 		}
 	}
 };

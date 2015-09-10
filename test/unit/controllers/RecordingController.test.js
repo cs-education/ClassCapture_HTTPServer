@@ -19,10 +19,10 @@ var should = chai.should();
 
 var VIDEO_FILE = "./test/test_assets/jmarr.mp4"; // Test file that tests will be uploading
 
-describe("Test Uploading and Downloading of Video", function () {
+describe("Test Uploading, Downloading, & Deletion of Video", () => {
 
-	describe("Test Uploading of Video", function () {
-		it("Should successfully upload the video to the server", function (done) {
+	describe("Test Uploading of Video", () => {
+		it("Should successfully upload the video to the server", done => {
 			request(sails.hooks.http.app)
 				.post("/video/jmarr-cpy.mp4")
 				.attach("video", VIDEO_FILE)
@@ -30,8 +30,8 @@ describe("Test Uploading and Downloading of Video", function () {
 		});
 	});
 
-	describe("Test Uploading of Video", function () {
-		it("Should successfully download the video from the server", function (done) {
+	describe("Test Dowloading of Video", () => {
+		it("Should successfully download the video from the server", done => {
 			request(sails.hooks.http.app)
 				.get("/video/jmarr-cpy.mp4")
 				.expect(function (res) {
@@ -39,6 +39,14 @@ describe("Test Uploading and Downloading of Video", function () {
 					var fileSize = stats.size;
 					assert.equal(res.header['content-length'], fileSize, "Uploaded file and downloaded file have different lengths");
 				})
+				.expect(200, done);
+		});
+	});
+
+	describe("Test Deletion of Video", () => {
+		it("Should successfully delete the video from the server", done => {
+			request(sails.hooks.http.app)
+				.del('/video/jmarr-cpy.mp4')
 				.expect(200, done);
 		});
 	});
