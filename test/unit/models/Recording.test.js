@@ -10,7 +10,7 @@
  */
 
 var request = require('supertest');
-var chai    = require("chai");
+var chai      = require("chai");
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -36,6 +36,10 @@ function datesEqual(dateA, dateB) {
 }
 
 describe("Test basic CRUD Ops in that order", function () {
+
+	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
+	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
+
 	var courseBody    = null;
 	var sectionBody   = null;
 	var recordingBody = null; // Will be populated in create test
@@ -45,6 +49,7 @@ describe("Test basic CRUD Ops in that order", function () {
 		it('Should create a new course entry', done => {
 			request(sails.hooks.http.app)
 				.post('/course/')
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
 					"department": "CS",
 					"number": 225,
@@ -64,6 +69,7 @@ describe("Test basic CRUD Ops in that order", function () {
 		it('Should create a new section under the course entry', done => {
 			request(sails.hooks.http.app)
 				.post('/section/')
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
 					"name": "AL1",
 					"course": courseBody.id
@@ -86,6 +92,7 @@ describe("Test basic CRUD Ops in that order", function () {
 
 			request(sails.hooks.http.app)
 				.post('/recording/')
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
 					"startTime": dates.start,
 					"endTime": dates.end,
@@ -109,6 +116,7 @@ describe("Test basic CRUD Ops in that order", function () {
 		it("Should grab the record that was just created and check that it hasn't changed", done => {
 			request(sails.hooks.http.app)
 				.get(`/recording/${recordingBody.id}`)
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(res => {
 					// Loop through each attribute in the body of the created response
 					// and make sure it matches with the body of the read response
@@ -133,6 +141,7 @@ describe("Test basic CRUD Ops in that order", function () {
 
 			request(sails.hooks.http.app)
 				.put("/recording/" + recordingBody.id)
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
 					"endTime": newEndTime
 				})
@@ -150,6 +159,7 @@ describe("Test basic CRUD Ops in that order", function () {
 		it("Should delete the record that was just updated", done => {
 			request(sails.hooks.http.app)
 				.del("/recording/" + recordingBody.id)
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(res => {
 					// Just check that you deleted the right record
 					assert.equal(res.body.id, recordingBody.id, "ID's didn't match up");
@@ -160,6 +170,7 @@ describe("Test basic CRUD Ops in that order", function () {
 		it('Should get a Not Found response when trying to fetch the recording that was just deleted', done => {
 			request(sails.hooks.http.app)
 				.get(`/recording/${recordingBody.id}`)
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(404, done);
 		});
 	});
