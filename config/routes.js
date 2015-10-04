@@ -46,9 +46,16 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+  // Routes for video transactions
   'post /video/:videoname': 'VideoController.uploadVideo',
   'put /video/:videoname': 'VideoController.uploadVideo',
   'get /video/:videoname': 'VideoController.getVideo',
-  'delete /video/:videoname': 'VideoController.deleteVideo'
+  'delete /video/:videoname': 'VideoController.deleteVideo',
+
+  // Routes for interacting with the Device ID blacklist
+  'get /blacklist': 'BlacklistController.getBlacklistIDs',
+  'get /blacklist/:id': 'BlacklistController.isInBlacklist',
+  'put /blacklist/:id': 'BlacklistController.addToBlacklist',
+  'delete /blacklist/:id': 'BlacklistController.removeFromBlacklist'
 
 };

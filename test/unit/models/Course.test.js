@@ -10,13 +10,17 @@
  */
 
 var request = require('supertest');
-var chai    = require("chai");
+var chai      = require("chai");
 
 var assert = chai.assert;
 var expect = chai.expect;
 var should = chai.should();
 
 describe('Test Basic CRUD Operations for Courses', () => {
+
+	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
+	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
+
 	var courseBody = null;
 
 	const courseDept = "CS";
@@ -25,6 +29,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 	it('Should Create a Course', done => {
 		request(sails.hooks.http.app)
 			.post('/course/')
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
 				"department": courseDept,
 				"number": courseNum
@@ -47,6 +52,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 	it('Should be able to read the course', done => {
 		request(sails.hooks.http.app)
 			.get(`/course/${courseBody.id}`)
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
 				// Upon get, the course will have the sections property initialized to an empty array
 				courseBody.should.eql(res.body);
@@ -60,6 +66,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 		
 		request(sails.hooks.http.app)
 			.put(`/course/${courseBody.id}`)
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
 				"number": newCourseNum
 			})
@@ -81,6 +88,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 	it('Should be able to delete the course', done => {
 		request(sails.hooks.http.app)
 			.del(`/course/${courseBody.id}`)
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
 				// Upon deletion, the deleted object is sent as a response.
 				// Make sure its the same object that we expected to be deleted
@@ -92,6 +100,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 	it('Should get Not Found response when trying to read the deleted course', done => {
 		request(sails.hooks.http.app)
 			.get(`/course/${courseBody.id}`)
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(404, done);
 	});
 });

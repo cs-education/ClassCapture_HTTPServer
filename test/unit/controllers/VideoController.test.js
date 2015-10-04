@@ -10,8 +10,8 @@
  */
 
 var request = require('supertest');
-var chai    = require("chai");
-var fs      = require('fs');
+var chai      = require("chai");
+var fs        = require('fs');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -21,10 +21,14 @@ var VIDEO_FILE = "./test/test_assets/jmarr.mp4"; // Test file that tests will be
 
 describe("Test Uploading, Downloading, & Deletion of Video", () => {
 
+	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
+	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
+
 	describe("Test Uploading of Video", () => {
 		it("Should successfully upload the video to the server", done => {
 			request(sails.hooks.http.app)
 				.post("/video/jmarr-cpy.mp4")
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.attach("video", VIDEO_FILE)
 				.expect(200, done);
 		});
@@ -34,6 +38,7 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 		it("Should successfully download the video from the server", done => {
 			request(sails.hooks.http.app)
 				.get("/video/jmarr-cpy.mp4")
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(function (res) {
 					var stats    = fs.statSync(VIDEO_FILE);
 					var fileSize = stats.size;
@@ -47,6 +52,7 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 		it("Should successfully delete the video from the server", done => {
 			request(sails.hooks.http.app)
 				.del('/video/jmarr-cpy.mp4')
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(200, done);
 		});
 	});

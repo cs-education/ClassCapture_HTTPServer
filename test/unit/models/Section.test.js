@@ -10,7 +10,7 @@
  */
 
 var request = require('supertest');
-var chai    = require("chai");
+var chai      = require("chai");
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -30,6 +30,10 @@ function getDates() {
 }
 
 describe('Basic CRUD Tests for Section Object', () => {
+
+	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
+	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
+	
 	var courseBody  = null; // to be populated and modified by tests
 	var sectionBody = null; // to be populated and modified by tests
 
@@ -39,6 +43,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 	it('Should Create a Course', done => {
 		request(sails.hooks.http.app)
 			.post('/course/')
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
 				"department": "CS",
 				"number": 225
@@ -67,6 +72,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 
 		request(sails.hooks.http.app)
 			.post('/section/')
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
 				startTime,
 				endTime,
@@ -99,6 +105,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 	it('Should read the previously created course and check that it now contains the section linked with it', done => {
 		request(sails.hooks.http.app)
 			.get(`/course/${courseBody.id}`)
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
 				courseBody = res.body;
 				// Just need to check that courseBody.sections contains the newly created section
@@ -112,6 +119,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 	it('Should be able to delete the course', done => {
 		request(sails.hooks.http.app)
 			.del(`/course/${courseBody.id}`)
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
 				// Upon deletion, the deleted object is sent as a response.
 				// Make sure its the same object that we expected to be deleted
@@ -123,6 +131,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 	it('Should be able to delete the section record', done => {
 		request(sails.hooks.http.app)
 			.del(`/section/${sectionBody.id}`)
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(200, done);
 	});
 });
