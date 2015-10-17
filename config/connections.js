@@ -76,7 +76,8 @@ module.exports.connections = {
   ***************************************************************************/
   postgresqlServer: {
     adapter: 'sails-postgresql',
-    host: '127.0.0.1',
+    host: 'localhost',
+    port: '5432',
     user: 'vmuser',
     password: 'freshhook19',
     database: 'classcapture',
