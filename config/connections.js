@@ -77,10 +77,10 @@ module.exports.connections = {
   postgresqlServer: {
     adapter: 'sails-postgresql',
     host: 'localhost',
-    port: '5432',
     user: 'vmuser',
     password: 'freshhook19',
     database: 'classcapture',
+    poolSize: 1,
     schema: true
   }
 
