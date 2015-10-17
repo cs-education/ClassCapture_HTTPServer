@@ -77,8 +77,8 @@ module.exports.connections = {
   postgresqlServer: {
     adapter: 'sails-postgresql',
     host: '127.0.0.1',
-    user: 'svdesai2',
-    password: 'ccDbFa15',
+    user: 'vmuser',
+    password: 'freshhook19',
     database: 'classcapture'
   }
 

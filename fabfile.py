@@ -4,8 +4,10 @@ from fabric.api import env, local, run, cd, sudo, open_shell, settings
 #   Must install node (which comes with npm) and git, and pm2 from npm
 #   Installing Node: http://askubuntu.com/questions/672994/how-to-install-nodejs-4-on-ubuntu-15-04-64-bit-edition
 #   Installing Git: https://www.digitalocean.com/community/tutorials/how-to-install-git-on-ubuntu-14-04
+#   ---- Helpful links during deployment ----
 #   Fixing npm global install issues: https://docs.npmjs.com/getting-started/fixing-npm-permissions
 #   Redirecting to port 80: http://richardfergie.com/redirect-port-80-to-a-different-port-using-iptables
+#   Deployment with SailsJS: http://sailsjs.org/documentation/concepts/deployment
 
 env.user = ""
 env.password = ""
