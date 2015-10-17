@@ -1,12 +1,10 @@
 /**
 * Recording.js
 *
-* @description :: Schema that contains metadata for a recording as well as path to video stored on disk
+* @description :: Schema that contains metadata for a recording
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
-var path = require("path");
-var fs   = require("fs");
 
 module.exports = {
 	"types": {
