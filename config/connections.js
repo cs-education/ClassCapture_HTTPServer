@@ -79,7 +79,8 @@ module.exports.connections = {
     host: '127.0.0.1',
     user: 'vmuser',
     password: 'freshhook19',
-    database: 'classcapture'
+    database: 'classcapture',
+    schema: true
   }
 
 

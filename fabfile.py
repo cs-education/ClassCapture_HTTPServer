@@ -50,15 +50,18 @@ def start_server():
     if must_create_videos_dir:
         run("mkdir %s" % videos_dir)
     with cd("~/%s" % git_repo_name):
-        open_shell()
         run("pm2 start app.json")
 
-def deploy(user, password, shell_before=False, shell_after=True):
+def deploy(user, password, do_test=False, shell_before=False, shell_after=True):
     env.user = user
     env.password = password
-    test()
+
     if shell_before:
         open_shell()
+
+    if do_test:
+        test()
+
     checkout()
     start_server()
     if shell_after:
