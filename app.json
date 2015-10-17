@@ -1,0 +1,9 @@
+{
+	"apps": [
+		{
+			"name"      : "ClassCapture",
+			"script"    : "./app.js",
+			"args"      : "['--prod']"
+		}
+	]
+}

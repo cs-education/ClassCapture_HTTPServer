@@ -8,6 +8,7 @@ from fabric.api import env, local, run, cd, sudo, open_shell, settings
 #   Fixing npm global install issues: https://docs.npmjs.com/getting-started/fixing-npm-permissions
 #   Redirecting to port 80: http://richardfergie.com/redirect-port-80-to-a-different-port-using-iptables
 #   Deployment with SailsJS: http://sailsjs.org/documentation/concepts/deployment
+#   Creating a Postgres DB on the VM: https://help.ubuntu.com/community/PostgreSQL
 
 env.user = ""
 env.password = ""
@@ -33,9 +34,9 @@ def checkout():
         must_clone_repo = run("test -d %s" % git_repo_name).failed
     if must_clone_repo:
         run("git clone %s%s.git" % (git_base_url, git_repo_name))
-    cd(git_repo_name)
-    run("git checkout origin master")
-    run("npm install") # install package dependencies
+    with cd("~/%s" % git_repo_name):
+        run("git pull origin master")
+        run("npm install") # install package dependencies
 
 def start_server():
     """
@@ -48,7 +49,9 @@ def start_server():
         must_create_videos_dir = run("test -d %s" % videos_dir).failed
     if must_create_videos_dir:
         run("mkdir %s" % videos_dir)
-    run("pm2 start app.js -i 0 -x -- --prod")
+    with cd("~/%s" % git_repo_name):
+        open_shell()
+        run("pm2 start app.json")
 
 def deploy(user, password, shell_before=False, shell_after=True):
     env.user = user
