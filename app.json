@@ -1,7 +1,7 @@
 {
 	"apps": [
 		{
-			"name"      : "ClassCapture",
+			"name"      : "API",
 			"script"    : "./app.js",
 			"args"      : "['--prod']"
 		}
