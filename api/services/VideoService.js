@@ -1,9 +1,10 @@
 var path        = require("path");
 var fs          = require('fs');
+var os          = require('os');
 var StatusError = require("statuserror");
 
 // Directory where all videos will be saved...this is an absolute path
-exports.SAVED_VIDEOS_DIR = path.resolve("~/classcapture_videos");
+exports.SAVED_VIDEOS_DIR = path.join(os.homedir(), "classcapture_videos");
 
 // Given a filename for a video, delete the video from the local file system
 exports.deleteVideo = (filename, cb) => {

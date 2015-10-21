@@ -14,7 +14,7 @@ env.user = ""
 env.password = ""
 env.hosts = ["classcapture1.cs.illinois.edu"]
 
-git_base_url = "https://github.com/sourabhdesai/"
+git_base_url = "https://github.com/cs-education/"
 git_repo_name = "ClassCapture_HTTPServer"
 videos_dir = "~/classcapture_videos"
 
@@ -52,15 +52,25 @@ def start_server():
     with cd("~/%s" % git_repo_name):
         run("pm2 start app.json")
 
+def reload_server(user, password, shell_after=True):
+    env.user = user
+    env.password = password
+
+    checkout()
+    with cd("~/%s" % git_repo_name):
+        run("pm2 reload app.json")
+    if shell_after:
+        open_shell()
+
 def deploy(user, password, do_test=False, shell_before=False, shell_after=True):
     env.user = user
     env.password = password
 
-    if shell_before:
-        open_shell()
-
     if do_test:
         test()
+
+    if shell_before:
+        open_shell()
 
     checkout()
     start_server()
