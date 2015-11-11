@@ -100,5 +100,20 @@ Here's some basic info on how to interact with the API. This is all just from th
 	- `DELETE`
 		- Delete the object with the specified ID.
 		
+### Video Storage Interface
+Just some more info on how to interact with the video storage system through the API server.
+
+- `video/<videoname>`
+	- `GET`
+		- Will respond with a filestream to the video file that is specified by the `videoname` parameter.
+	- `POST`
+		- Used to upload a new video to the video storage. The filename for the video is specified by the `videoname` parameter.
+		- Request must be a multi-part file upload
+	- `PUT`
+		- Used to overwrite an existing video that exists in video storage. The filename for the video you wish to overwrite should be specified by the `videoname` parameter.
+		- Request should be a multi-part file upload.
+	- `DELETE`
+		- Used to delete the video specified by the `videoname` parameter.
+		
 ### Complex Queries
 You can also do complex queries with the API. The [Sails JS Docs on this topic](http://sailsjs.org/documentation/reference/blueprint-api/find-where) give a good overview on how to do this.
