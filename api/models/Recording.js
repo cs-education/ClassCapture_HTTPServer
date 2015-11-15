@@ -35,7 +35,11 @@ module.exports = {
 		"section": {
 			"model": "Section",
 			"required": true
-		}
+		},
+    "comments": {
+      "collection": "Comment",
+      "via": "recording"
+    }
 	},
 
 	// Lifecycle callbacks (more info: http://sailsjs.org/#!/documentation/concepts/ORM/Lifecyclecallbacks.html)
