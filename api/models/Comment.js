@@ -16,7 +16,7 @@ module.exports = {
       required: true
     },
     poster: {
-      model: 'user',
+      model: 'user'
     },
     recording: {
       model: 'recording',
