@@ -17,8 +17,6 @@ var assert = chai.assert;
 var expect = chai.expect;
 var should = chai.should();
 
-var VIDEO_FILE = "./test/test_assets/jmarr.mp4"; // Test file that tests will be uploading
-
 describe('Simple operations with blacklist functionality', () => {
 	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
 	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";

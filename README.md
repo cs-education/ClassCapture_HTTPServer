@@ -117,3 +117,12 @@ Just some more info on how to interact with the video storage system through the
 		
 ### Complex Queries
 You can also do complex queries with the API. The [Sails JS Docs on this topic](http://sailsjs.org/documentation/reference/blueprint-api/find-where) give a good overview on how to do this.
+
+## Dev Tips
+
+### Database Seeding for Development
+- I've added some seed scripts to help out with development. These scripts will prepopulate the database with entries for each of the `Course`, `Section`, `Recording` objects. These scripts can be found in the `test/seed_scripts` directory.
+- To run a seed script, like `test/seed_scripts/Course.seed.test.js`, you can do so by typing `mocha test/bootstrap.test.js test/seed_scripts/Course.seed.test.js`. This must be done in the base directory of the project (same level as `package.json`).
+- You must run the seed scripts in this order: `test/seed_scripts/Course.seed.test.js`, `test/seed_scripts/Section.seed.test.js`,`test/seed_scripts/Recording.seed.test.js`
+- For convenience, I've added a one-line npm script to the `package.json`. To run all the seed scripts at once, just run `npm run-script seed`.
+- Additionally, you can also just copy `test/seed_db_files/seeded_db.json` into the `.tmp/localDiskDb.db` file and unzip the contents of `test/seed_db_files/classcapture_videos.zip` into `~/classcapture_videos/`.

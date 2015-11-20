@@ -5,6 +5,7 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
+    "bluebird": "^3.0.5",
     "ejs": "~0.8.4",
     "grunt": "0.4.2",
     "grunt-contrib-clean": "~0.5.0",
@@ -30,7 +31,8 @@
   "scripts": {
     "debug": "node-debug app.js",
     "start": "node app.js",
-    "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js"
+    "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js",
+    "seed": "mocha test/bootstrap.test.js test/seed_scripts/Course.seed.test.js test/seed_scripts/Section.seed.test.js test/seed_scripts/Recording.seed.test.js"
   },
   "main": "app.js",
   "repository": {
@@ -41,6 +43,7 @@
   "license": "",
   "devDependencies": {
     "chai": "^2.3.0",
+    "chance": "^0.8.0",
     "supertest": "^1.0.1"
   },
   "engines": {

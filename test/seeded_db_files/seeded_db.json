@@ -1,0 +1,145 @@
+{
+  "data": {
+    "course": [
+      {
+        "department": "ZVI",
+        "number": 350,
+        "createdAt": "2015-11-20T16:25:21.279Z",
+        "updatedAt": "2015-11-20T16:25:21.280Z",
+        "id": 1
+      }
+    ],
+    "recording": [
+      {
+        "startTime": "2015-11-20T16:25:21.424Z",
+        "endTime": "2015-11-20T16:27:07.424Z",
+        "section": 1,
+        "filename": "1448036721424_1448036827424_1448036721490_4822.mp4",
+        "createdAt": "2015-11-20T16:25:21.494Z",
+        "updatedAt": "2015-11-20T16:25:21.494Z",
+        "id": 1
+      },
+      {
+        "startTime": "2015-11-20T16:25:21.425Z",
+        "endTime": "2015-11-20T16:27:07.425Z",
+        "section": 1,
+        "filename": "1448036721425_1448036827425_1448036721493_439.mp4",
+        "createdAt": "2015-11-20T16:25:21.503Z",
+        "updatedAt": "2015-11-20T16:25:21.503Z",
+        "id": 2
+      },
+      {
+        "startTime": "2015-11-20T16:25:21.425Z",
+        "endTime": "2015-11-20T16:27:07.425Z",
+        "section": 1,
+        "filename": "1448036721425_1448036827425_1448036721494_8160.mp4",
+        "createdAt": "2015-11-20T16:25:21.503Z",
+        "updatedAt": "2015-11-20T16:25:21.503Z",
+        "id": 3
+      }
+    ],
+    "section": [
+      {
+        "startTime": "1969-12-31T16:25:00.000Z",
+        "endTime": "1969-12-31T17:25:00.000Z",
+        "name": "2L0",
+        "course": 1,
+        "createdAt": "2015-11-20T16:25:21.399Z",
+        "updatedAt": "2015-11-20T16:25:21.399Z",
+        "id": 1
+      }
+    ]
+  },
+  "schema": {
+    "course": {
+      "department": {
+        "type": "string"
+      },
+      "number": {
+        "type": "integer"
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "recording": {
+      "startTime": {
+        "type": "datetime"
+      },
+      "endTime": {
+        "type": "datetime"
+      },
+      "filename": {
+        "type": "string",
+        "unique": true
+      },
+      "section": {
+        "type": "integer",
+        "model": "section",
+        "foreignKey": true,
+        "alias": "section"
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "section": {
+      "startTime": {
+        "type": "datetime"
+      },
+      "endTime": {
+        "type": "datetime"
+      },
+      "name": {
+        "type": "string"
+      },
+      "course": {
+        "type": "integer",
+        "model": "course",
+        "foreignKey": true,
+        "alias": "course"
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    }
+  },
+  "counters": {
+    "course": {
+      "id": 1
+    },
+    "recording": {
+      "id": 3
+    },
+    "section": {
+      "id": 1
+    }
+  }
+}

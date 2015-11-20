@@ -17,7 +17,7 @@ var assert = chai.assert;
 var expect = chai.expect;
 var should = chai.should();
 
-var VIDEO_FILE = "./test/test_assets/jmarr.mp4"; // Test file that tests will be uploading
+var VIDEO_FILE = "./test/test_assets/106000.mp4"; // Test file that tests will be uploading
 
 describe("Test Uploading, Downloading, & Deletion of Video", () => {
 
@@ -27,7 +27,7 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 	describe("Test Uploading of Video", () => {
 		it("Should successfully upload the video to the server", done => {
 			request(sails.hooks.http.app)
-				.post("/video/jmarr-cpy.mp4")
+				.post("/video/106000-cpy.mp4")
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.attach("video", VIDEO_FILE)
 				.expect(200, done);
@@ -37,7 +37,7 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 	describe("Test Dowloading of Video", () => {
 		it("Should successfully download the video from the server", done => {
 			request(sails.hooks.http.app)
-				.get("/video/jmarr-cpy.mp4")
+				.get("/video/106000-cpy.mp4")
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(function (res) {
 					var stats    = fs.statSync(VIDEO_FILE);
@@ -51,7 +51,7 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 	describe("Test Deletion of Video", () => {
 		it("Should successfully delete the video from the server", done => {
 			request(sails.hooks.http.app)
-				.del('/video/jmarr-cpy.mp4')
+				.del('/video/106000-cpy.mp4')
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(200, done);
 		});
