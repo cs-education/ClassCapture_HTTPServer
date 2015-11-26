@@ -43,6 +43,11 @@ module.exports = {
 	},
 
 	"beforeValidate": function (values, cb) {
+    // prevent any tampering with automatic attributes
+    delete values.id;
+    delete values.createdAt;
+    delete values.updatedAt;
+
 		// Only update times to epoch if both are present
 		if (_.has(values, "startTime") && _.has(values, "endTime")) {
 			// Change startTime and endTime to be at the same time of day, but have the date of epoch
