@@ -27,6 +27,18 @@ module.exports.models = {
   * See http://sailsjs.org/#!/documentation/concepts/ORM/model-settings.html  *
   *                                                                          *
   ***************************************************************************/
-  migrate: 'alter'
+  migrate: 'alter',
 
+  // only allow attributes defined in the model to be stored
+  schema: true,
+
+  // prevent any tampering with automatic attributes
+  beforeValidate: function (values, cb) {
+    // models that override this function should include these lines
+    delete values.id;
+    delete values.createdAt;
+    delete values.updatedAt;
+
+    process.nextTick(cb);
+  },
 };
