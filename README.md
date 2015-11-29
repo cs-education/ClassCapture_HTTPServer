@@ -56,7 +56,11 @@ Look at `api/models/Course.js` for a concrete, up to date representation of this
 	- `sections`
 		- The sections under this course. This would things like Lecture, Discussion, or Lab sections for a particular course.
 		- Type: Collection of Sections (AKA `Section Array`)
-		- This can just be an array of Section IDs like `[1,3,67]`
+		- This can just be an array of Section IDs like `[1,3,67]`	
+	- `year`
+		- The year that the course is in (such as 2015)
+	- `semester`
+		- The semester, which can either be in ['fall', 'spring', 'semester']
 	
 ### Section
 Look at `api/models/Section.js` for a concrete, up to date representation of this model. A Section contains basic metadqta for a Section that is part of a course.
