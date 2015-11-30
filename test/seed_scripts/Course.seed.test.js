@@ -41,28 +41,8 @@ function testSuccessCreateCourse(dept, num, semester, year) {
 			.expect(201, done);
 	});
 }
-// Invalid department causes an 'E_VALIDATION' error, which is a 400 error
-function testInvalidDeptCreateCourse(dept, num, semester, year) {
-	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
-	it(`Should NOT create a Course Entry called "${dept} ${num}, ${semester} ${year}"`, done => {
-		request(sails.hooks.http.app)
-			.post('/course/')
-			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
-			.send({
-				"department": dept,
-				"number": num,
-				"year": year,
-				"semester": semester
-			})
-			.expect(res => {
-				res.body.error.should.equal('E_VALIDATION');
-				res.body.status.should.equal(400);;
-			})
-			.expect(400, done)
-	});
-}
-// Invalid section causes an 'E_UNKNOWN' error, which is a 500 error
-function testInvalidSectionCreateCourse(dept, num, semester, year) {
+// Invalid course causes an 'E_UNKNOWN' error, which is a 500 error, due to the the next("Invalid course") call. Will print the error into the terminal, but the test still passes.
+function testInvalidCreateCourse(dept, num, semester, year) {
 	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
 	it(`Should NOT create a Course Entry called "${dept} ${num}, ${semester} ${year}"`, done => {
 		request(sails.hooks.http.app)
@@ -83,8 +63,6 @@ function testInvalidSectionCreateCourse(dept, num, semester, year) {
 }
 
 describe(`Create ${NUM_COURSES} Course Entries`, () => {
-	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
-
 	var courseDept = "CS";
 	var courseNum = 225;
 	var semester = "fall";
@@ -99,9 +77,9 @@ describe(`Create ${NUM_COURSES} Course Entries`, () => {
 	// CS410 is only offered in the spring, so fall should fail
 	semester = "fall";
 	// Actually causes the 500 (server error) response to be received in the terminal. Not sure how to surpress that, but test still passes. 
-	testInvalidSectionCreateCourse(courseDept, courseNum, semester, year);
+	testInvalidCreateCourse(courseDept, courseNum, semester, year);
 
 	// Test invalid department
-	courseDept = "xyz";
-	testInvalidDeptCreateCourse(courseDept, courseNum, semester, year);
+	courseDept = "BCD";
+	testInvalidCreateCourse(courseDept, courseNum, semester, year);
 });

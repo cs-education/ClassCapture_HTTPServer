@@ -45,12 +45,8 @@ module.exports = {
 	},
 
 	// Lifecycle Callbacks
-	beforeValidation: function(values, cb){
+	beforeValidation: function(values, next){
 		values.key = values.department+values.number+values.semester+values.year;
-		cb();
-	},
-
-	beforeCreate: function(values, cb){
 		// Validate that the course is a valid course
 		var url = "http://courses.illinois.edu/cisapp/explorer/schedule/" + values.year + "/" + values.semester + "/" + values.department +"/" + values.number + ".xml";
 		var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -58,13 +54,12 @@ module.exports = {
 		http.open('HEAD', url, false);
 		http.send();
 		// Check to see if the course is valid in the Course API
-		var courseExists = (http.status!=404 && http.status!=500 && http.status!=400);
-		if (courseExists) {
-			cb();
+		if (http.status!=404) {
+			next();
 		}
 		else {
-			cb(new Error());
+			next("Invalid course");
 		}
-	} 
+	}
 };
 
