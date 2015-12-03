@@ -66,6 +66,9 @@ module.exports = {
 					"size": uploadedFile.size, // In bytes
 					"type": uploadedFile.type
 				});
+
+        var filename = path.basename(uploadedFile.fd);
+        sails.models.recording.update({filename: filename}, {updatedAt: new Date()});
 			} else {
 				// If not an mp4, respond with a 400 (Bad Request) and delete the saved video file
 				res.badRequest(`Server only accepts mp4 format video files. Given file extension: ${fileExtension}`)
