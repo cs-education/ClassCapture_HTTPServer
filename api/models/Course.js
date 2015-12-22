@@ -29,7 +29,7 @@ module.exports = {
 			"collection": "Section",
 			"via": "course"
 		},
-			"year": { // Example: CS 225 in the year 2015
+		"year": { // Example: CS 225 in the year 2015
 			"type": "integer",
 			"required": true
 		},
@@ -38,28 +38,22 @@ module.exports = {
 			"enum": ["spring", "summer", "fall"],
 			"required" : true
 		},
-		"key": { //Unique key for the course. Just the concatenation of department+number+semester+year, for example CS225fall2015.
-			"type": "string",
-			"unique": true
-		}
 	},
 
 	// Lifecycle Callbacks
-	beforeValidation: function(values, next){
-		values.key = values.department+values.number+values.semester+values.year;
-		// Validate that the course is a valid course
-		var url = "http://courses.illinois.edu/cisapp/explorer/schedule/" + values.year + "/" + values.semester + "/" + values.department +"/" + values.number + ".xml";
-		var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-		var http = new XMLHttpRequest();
-		http.open('HEAD', url, false);
-		http.send();
-		// Check to see if the course is valid in the Course API
-		if (http.status!=404) {
-			next();
-		}
-		else {
-			next("Invalid course");
-		}
-	}
+	beforeCreate: function(values, next){
+		CatalogValidationService.isValidCourse(values, function (err, isValid) {
+			if(!err){
+				next();
+			}
+			else{
+				next(err);
+			}
+		})
+	},
+	beforeUpdate: function(valuesToUpdate, next){
+		// TODO: Get id of object we are updating, and perform validation via course catalog
+		next();
+ 	}
 };
 

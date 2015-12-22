@@ -10,7 +10,7 @@ var should = chai.should();
 
 const NUM_COURSES = 1;
 
-function testSuccessCreateCourse(dept, num, semester, year) {
+function createCourse(dept, num, semester, year) {
 	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
 	it(`Should create a Course Entry called "${dept} ${num}, ${semester} ${year}"`, done => {
 		request(sails.hooks.http.app)
@@ -41,45 +41,15 @@ function testSuccessCreateCourse(dept, num, semester, year) {
 			.expect(201, done);
 	});
 }
-// Invalid course causes an 'E_UNKNOWN' error, which is a 500 error, due to the the next("Invalid course") call. Will print the error into the terminal, but the test still passes.
-function testInvalidCreateCourse(dept, num, semester, year) {
-	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
-	it(`Should NOT create a Course Entry called "${dept} ${num}, ${semester} ${year}"`, done => {
-		request(sails.hooks.http.app)
-			.post('/course/')
-			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
-			.send({
-				"department": dept,
-				"number": num,
-				"year": year,
-				"semester": semester
-			})
-			.expect(res => {
-				res.body.error.should.equal('E_UNKNOWN');
-				res.body.status.should.equal(500);;
-			})
-			.expect(500, done)
-	});
-}
 
 describe(`Create ${NUM_COURSES} Course Entries`, () => {
 	var courseDept = "CS";
 	var courseNum = 225;
 	var semester = "fall";
 	var year = 2015;
-	testSuccessCreateCourse(courseDept, courseNum, semester, year);
+	createCourse(courseDept, courseNum, semester, year);
 
-	courseDept = "CS";
 	courseNum = 410;
 	semester = "spring"
-	testSuccessCreateCourse(courseDept, courseNum, semester, year);
-
-	// CS410 is only offered in the spring, so fall should fail
-	semester = "fall";
-	// Actually causes the 500 (server error) response to be received in the terminal. Not sure how to surpress that, but test still passes. 
-	testInvalidCreateCourse(courseDept, courseNum, semester, year);
-
-	// Test invalid department
-	courseDept = "BCD";
-	testInvalidCreateCourse(courseDept, courseNum, semester, year);
+	createCourse(courseDept, courseNum, semester, year);
 });

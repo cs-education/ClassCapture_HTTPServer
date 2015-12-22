@@ -25,6 +25,8 @@ describe('Test Basic CRUD Operations for Courses', () => {
 
 	const courseDept = "CS";
 	const courseNum  = 225;
+	const semester = "fall";
+	const year = 2015;
 
 	it('Should Create a Course', done => {
 		request(sails.hooks.http.app)
@@ -32,7 +34,9 @@ describe('Test Basic CRUD Operations for Courses', () => {
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
 				"department": courseDept,
-				"number": courseNum
+				"number": courseNum,
+				"semester": semester,
+				"year": year
 			})
 			.expect(res => {
 				courseBody = res.body;
@@ -40,6 +44,10 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				courseBody.department.should.equal(courseDept);
 				courseBody.should.have.property('number');
 				courseBody.number.should.equal(courseNum);
+				courseBody.should.have.property('semester');
+				courseBody.semester.should.equal(semester);
+				courseBody.should.have.property('year');
+				courseBody.year.should.equal(year);
 				courseBody.should.have.property('id');
 
 				// Upon creation, the returned object doesn't have the sections property
@@ -103,4 +111,46 @@ describe('Test Basic CRUD Operations for Courses', () => {
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(404, done);
 	});
+
+	// Now let's test a fail to create, invalid department first
+	const invalidCourseDept = "BCD";
+	it(`Should NOT create a Course Entry called "${invalidCourseDept} ${courseNum}, ${semester} ${year}"`, done => {
+		request(sails.hooks.http.app)
+			.post('/course/')
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
+			.send({
+				"department": invalidCourseDept,
+				"number": courseNum,
+				"year": year,
+				"semester": semester
+			})
+			.expect(res => {
+				console.log(res.body);
+				res.body.error.should.equal('E_UNKNOWN');
+				res.body.status.should.equal(500);;
+			})
+			.expect(500, done)
+	});
+
+	// Now test valid course, invalid semester. CS 410 is offered spring only
+	const invalidSemesterCourseNum = 410;
+	const invalidSemester = "fall";
+	it(`Should NOT create a Course Entry called "${courseDept} ${invalidSemesterCourseNum}, ${invalidSemester} ${year}"`, done => {
+		request(sails.hooks.http.app)
+			.post('/course/')
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
+			.send({
+				"department": courseDept,
+				"number": invalidSemesterCourseNum,
+				"year": year,
+				"semester": invalidSemester
+			})
+			.expect(res => {
+				console.log(res.body);
+				res.body.error.should.equal('E_UNKNOWN');
+				res.body.status.should.equal(500);;
+			})
+			.expect(500, done)
+	});
+
 });

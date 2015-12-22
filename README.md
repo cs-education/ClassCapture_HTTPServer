@@ -60,9 +60,7 @@ Look at `api/models/Course.js` for a concrete, up to date representation of this
 	- `year`
 		- The year that the course is in (such as 2015)
 	- `semester`
-		- The semester, which can either be in ['fall', 'spring', 'semester']
-	- `key`
-		- Simply the concatenation of department+number+semester+year, used to prevent duplicate courses from being created.
+		- The semester, which can either be in ['spring', 'summer', 'fall']
 	
 ### Section
 Look at `api/models/Section.js` for a concrete, up to date representation of this model. A Section contains basic metadqta for a Section that is part of a course.
