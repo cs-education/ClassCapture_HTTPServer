@@ -28,6 +28,9 @@ describe('Test Basic CRUD Operations for Courses', () => {
 	const semester = "fall";
 	const year = 2015;
 
+	const badId = 2000000000;
+  	const badDate = new Date(0);
+
 	it('Should Create a Course', done => {
 		request(sails.hooks.http.app)
 			.post('/course/')
@@ -36,7 +39,10 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				"department": courseDept,
 				"number": courseNum,
 				"semester": semester,
-				"year": year
+				"year": year,
+		        "id": badId,
+		        "createdAt": badDate,
+		        "updatedAt": badDate
 			})
 			.expect(res => {
 				courseBody = res.body;
@@ -49,6 +55,11 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				courseBody.should.have.property('year');
 				courseBody.year.should.equal(year);
 				courseBody.should.have.property('id');
+
+        // these attributes should not take on the bad values
+        courseBody.id.should.not.equal(badId);
+        courseBody.createdAt.should.not.equal(badDate);
+        courseBody.updatedAt.should.not.equal(badDate);
 
 				// Upon creation, the returned object doesn't have the sections property
 				// Manually add it here so it can be referenced in future tests
@@ -76,7 +87,11 @@ describe('Test Basic CRUD Operations for Courses', () => {
 			.put(`/course/${courseBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
-				"number": newCourseNum
+				"number": newCourseNum,
+        "extraAttribute": "extraAttribute",
+        "id": badId,
+        "createdAt": badDate,
+        "updatedAt": badDate
 			})
 			.expect(res => {
 				// Check that parts of course that weren't supposed to change weren't changed
@@ -152,5 +167,4 @@ describe('Test Basic CRUD Operations for Courses', () => {
 			})
 			.expect(500, done)
 	});
-
 });
