@@ -80,7 +80,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 			.expect(200, done);
 	});
 
-	it('Should be able to update the course', done => {
+	it('Should not be able to update the course', done => {
 		const newCourseNum = 241;
 		
 		request(sails.hooks.http.app)
@@ -93,19 +93,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
         "createdAt": badDate,
         "updatedAt": badDate
 			})
-			.expect(res => {
-				// Check that parts of course that weren't supposed to change weren't changed
-				// The fields number and updatedAt are the only ones that should've changed
-				var newCourseStaticParts = _.omit(res.body, ['number', 'updatedAt']);
-				var oldCourseStaticParts = _.omit(courseBody, ['number', 'updatedAt']);
-				newCourseStaticParts.should.eql(oldCourseStaticParts);
-
-				// Update courseBody to have the latest changes
-				courseBody = res.body;
-				// Check that changes were made appropriately
-				courseBody.number.should.equal(newCourseNum);
-			})
-			.expect(200, done);
+			.expect(500, done);
 	});
 
 	it('Should be able to delete the course', done => {
@@ -140,7 +128,6 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				"semester": semester
 			})
 			.expect(res => {
-				console.log(res.body);
 				res.body.error.should.equal('E_UNKNOWN');
 				res.body.status.should.equal(500);;
 			})
@@ -161,7 +148,6 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				"semester": invalidSemester
 			})
 			.expect(res => {
-				console.log(res.body);
 				res.body.error.should.equal('E_UNKNOWN');
 				res.body.status.should.equal(500);;
 			})

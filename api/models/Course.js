@@ -51,9 +51,9 @@ module.exports = {
 			}
 		})
 	},
-	beforeUpdate: function(valuesToUpdate, next){
-		// TODO: Get id of object we are updating, and perform validation via course catalog
-		next();
- 	}
+	beforeUpdate: function (values, next) {
+		var StatusError = require("statuserror");
+		next(new StatusError(400, "Course Entries Cannot Be Modified")); 
+	}
 };
 
