@@ -26,7 +26,12 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  '*': 'deviceBlacklistPolicy'
+  'BlacklistController': 'deviceBlacklistPolicy',
+  'CommentController': 'deviceBlacklistPolicy',
+  'CourseController': 'deviceBlacklistPolicy',
+  'RecordingController': 'deviceBlacklistPolicy',
+  'SectionController': 'deviceBlacklistPolicy',
+  'UserController': 'deviceBlacklistPolicy'
 
   /***************************************************************************
   *                                                                          *
