@@ -1,5 +1,31 @@
-var request = require('supertest');
-var should  = require('chai').should();
+var request    = require('supertest');
+var should     = require('chai').should();
+var authHelper = require('../test_helpers/authHelper');
+var Chance     = require('chance');
+
+var chance = new Chance();
+
+var agent = null; // to be populated in before hook
+
+before(done => {
+  // Drops database between each test.  This works because we use
+  // the memory database
+  sails.once('hook:orm:reloaded', err => {
+    if (err) {
+      return done(err);
+    }
+    authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+      if (err) {
+        return done(err);
+      }
+
+      agent = loggedInAgent;
+      done();
+    });
+  });
+  
+  sails.emit('hook:orm:reload');
+});
 
 describe('Test basic CRUD operations for Comment', function () {
   const MOCK_DEVICE_ID = 'test';
@@ -11,7 +37,7 @@ describe('Test basic CRUD operations for Comment', function () {
   var commentBody;
 
   it('Should create a course', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .post('/course/')
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .send({
@@ -25,7 +51,7 @@ describe('Test basic CRUD operations for Comment', function () {
   });
 
   it('Should create a section', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .post('/section/')
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .send({
@@ -43,7 +69,7 @@ describe('Test basic CRUD operations for Comment', function () {
     var end = new Date(start);
     end.setHours(end.getHours() + 1);
 
-    request(sails.hooks.http.app)
+    agent
       .post('/recording/')
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .send({
@@ -58,12 +84,17 @@ describe('Test basic CRUD operations for Comment', function () {
   });
 
   it('Should create a user', function (done) {
-    request(sails.hooks.http.app)
+    var name = chance.name().split(' ');
+    agent
       .post('/user/')
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .send({
-        name: 'name',
-        email: 'email'
+        firstName: name[0],
+        lastName: name[1],
+        email: chance.email({
+          domain: chance.pick(UserService.VALID_EMAIL_DOMAINS)
+        }),
+        password: chance.word({length: 6})
       })
       .expect(function (res) {
         userBody = res.body;
@@ -73,7 +104,7 @@ describe('Test basic CRUD operations for Comment', function () {
 
   var date = new Date();
   it('Should be able to create a comment', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .post('/comment/')
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .send({
@@ -97,7 +128,7 @@ describe('Test basic CRUD operations for Comment', function () {
   });
 
   it('Should be able to get the comment', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .get('/comment/' + commentBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(function (res) {
@@ -111,7 +142,7 @@ describe('Test basic CRUD operations for Comment', function () {
   });
 
   it('Should be linked to the poster', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .get('/user/' + userBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(function (res) {
@@ -121,7 +152,7 @@ describe('Test basic CRUD operations for Comment', function () {
   });
 
   it('Should be linked to the recording', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .get('/recording/' + recordingBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(function (res) {
@@ -131,7 +162,7 @@ describe('Test basic CRUD operations for Comment', function () {
   });
 
   it('Should be able to update the comment', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .put('/comment/' + commentBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .send({
@@ -145,7 +176,7 @@ describe('Test basic CRUD operations for Comment', function () {
   });
 
   it('Should be able to delete the comment', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .del('/comment/' + commentBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(function (res) {
@@ -155,35 +186,35 @@ describe('Test basic CRUD operations for Comment', function () {
   });
 
   it('Should get a 404 when getting the comment', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .get('/comment/' + commentBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(404, done);
   });
 
   it('Should delete the user', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .del('/user/' + userBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(200, done);
   });
 
   it('Should delete the recording', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .del('/recording/' + recordingBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(200, done);
   });
 
   it('Should delete the section', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .del('/section/' + sectionBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(200, done);
   });
 
   it('Should delete the course', function (done) {
-    request(sails.hooks.http.app)
+    agent
       .del('/course/' + courseBody.id)
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .expect(200, done);

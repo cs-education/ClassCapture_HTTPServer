@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
 
 		if (inBlacklist) {
 			sails.log.warn("Request was from Blacklisted Device");
-			return res.forbidden("You're access to the API has been revoked");
+			return res.forbidden("Your access to the API has been revoked");
 		}
 
 		next();

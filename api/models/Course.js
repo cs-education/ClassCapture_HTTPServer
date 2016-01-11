@@ -5,6 +5,8 @@
 * @docs        : http://sailsjs.org/#!documentation/models
 */
 
+var StatusError = require('statuserror');
+
 const DEPT_MIN_LENGTH = 2;
 const DEPT_NAME_REGEX = new RegExp(/^[A-Z]+$/);
 
@@ -41,18 +43,19 @@ module.exports = {
 	},
 
 	// Lifecycle Callbacks
-	beforeCreate: function(values, next){
-		CatalogValidationService.isValidCourse(values, function (err, isValid) {
-			if(!err){
+	beforeCreate: function (values, next) {
+		const validators = [CatalogValidationService.isUniqueCourse, CatalogValidationService.isValidCourse];
+		
+		async.every(validators, (validator, cb) => validator(values, cb), isValid => {
+			if (isValid) {
 				next();
+			} else {
+				next(new StatusError(400, 'Not a valid course'));
 			}
-			else{
-				next(err);
-			}
-		})
+		});
 	},
+
 	beforeUpdate: function (values, next) {
-		var StatusError = require("statuserror");
 		next(new StatusError(400, "Course Entries Cannot Be Modified")); 
 	}
 };

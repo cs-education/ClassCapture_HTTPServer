@@ -35,4 +35,7 @@ module.exports = {
   //   level: "silent"
   // }
 
+  jwtSecret: 'hakunamatata1984',
+  jwtExpiration: '7 days'
+
 };

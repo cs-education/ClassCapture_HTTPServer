@@ -26,12 +26,16 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  'BlacklistController': 'deviceBlacklistPolicy',
-  'CommentController': 'deviceBlacklistPolicy',
-  'CourseController': 'deviceBlacklistPolicy',
-  'RecordingController': 'deviceBlacklistPolicy',
-  'SectionController': 'deviceBlacklistPolicy',
-  'UserController': 'deviceBlacklistPolicy'
+  'BlacklistController': ['deviceBlacklistPolicy', 'userAuthPolicy'],
+  'CommentController': ['deviceBlacklistPolicy', 'userAuthPolicy'],
+  'CourseController': ['deviceBlacklistPolicy', 'userAuthPolicy'],
+  'RecordingController': ['deviceBlacklistPolicy', 'userAuthPolicy'],
+  'SectionController': ['deviceBlacklistPolicy', 'userAuthPolicy'],
+  'UserController': {
+    '*': 'deviceBlacklistPolicy',
+    'me': 'userAuthPolicy',
+    'logout': 'userAuthPolicy'
+  }
 
   /***************************************************************************
   *                                                                          *

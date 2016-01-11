@@ -9,8 +9,9 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request = require('supertest');
-var chai      = require("chai");
+var request    = require('supertest');
+var chai       = require("chai");
+var authHelper = require('../test_helpers/authHelper');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -29,6 +30,28 @@ function getDates() {
 	};
 }
 
+var agent = null; // to be populated in before hook
+
+before(done => {
+	// Drops database between each test.  This works because we use
+	// the memory database
+	sails.once('hook:orm:reloaded', err => {
+		if (err) {
+			return done(err);
+		}
+		authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+			if (err) {
+				return done(err);
+			}
+
+			agent = loggedInAgent;
+			done();
+		});
+	});
+	
+	sails.emit('hook:orm:reload');
+});
+
 describe('Basic CRUD Tests for Section Object', () => {
 
 	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
@@ -41,7 +64,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 	const courseNum  = 225;
 
 	it('Should Create a Course', done => {
-		request(sails.hooks.http.app)
+		agent
 			.post('/course/')
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
@@ -64,35 +87,18 @@ describe('Basic CRUD Tests for Section Object', () => {
 	});
 
 	it('Should create a section for the newly created Course', done => {
-		var dates = getDates();
-
-		var startTime   = dates.start;
-		var endTime     = dates.end;
 		var sectionName = "AL1";
 
-		request(sails.hooks.http.app)
+		agent
 			.post('/section/')
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
-				startTime,
-				endTime,
 				"name": sectionName,
 				"course": courseBody.id
 			})
 			.expect(res => {
 				sectionBody = res.body;
 				// Check that properties of returned section are appropriately defined and valued
-				// startTime and endTime are returned as string formatted Dates, so need to convert them back to Date type
-				sectionBody.should.have.property("startTime");
-				var resStartTime = new Date(sectionBody.startTime);
-				resStartTime.getHours().should.equal(startTime.getHours());
-				resStartTime.getMinutes().should.equal(startTime.getMinutes());
-				
-				sectionBody.should.have.property("endTime");
-				var resEndTime = new Date(sectionBody.endTime);
-				resEndTime.getHours().should.equal(endTime.getHours());
-				resEndTime.getMinutes().should.equal(endTime.getMinutes());
-				
 				sectionBody.should.have.property("name");
 				sectionBody.name.should.equal(sectionName);
 				
@@ -103,7 +109,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 	});
 
 	it('Should read the previously created course and check that it now contains the section linked with it', done => {
-		request(sails.hooks.http.app)
+		agent
 			.get(`/course/${courseBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
@@ -117,7 +123,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 	});
 
 	it('Should be able to delete the course', done => {
-		request(sails.hooks.http.app)
+		agent
 			.del(`/course/${courseBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
@@ -129,7 +135,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 	});
 
 	it('Should be able to delete the section record', done => {
-		request(sails.hooks.http.app)
+		agent
 			.del(`/section/${sectionBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(200, done);

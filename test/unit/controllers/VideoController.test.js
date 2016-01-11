@@ -9,9 +9,10 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request = require('supertest');
-var chai      = require("chai");
-var fs        = require('fs');
+var request    = require('supertest');
+var chai       = require("chai");
+var fs         = require('fs');
+var authHelper = require('../test_helpers/authHelper');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -23,10 +24,22 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 
 	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
 	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
+	var agent = null; // to be populated in before hook
+
+	before(done => {
+		authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+			if (err) {
+				return done(err);
+			}
+
+			agent = loggedInAgent;
+			done();
+		});
+	});
 
 	describe("Test Uploading of Video", () => {
 		it("Should successfully upload the video to the server", done => {
-			request(sails.hooks.http.app)
+			agent
 				.post("/video/106000-cpy.mp4")
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.attach("video", VIDEO_FILE)
@@ -36,7 +49,7 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 
 	describe("Test Dowloading of Video", () => {
 		it("Should successfully download the video from the server", done => {
-			request(sails.hooks.http.app)
+			agent
 				.get("/video/106000-cpy.mp4")
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(function (res) {
@@ -50,7 +63,7 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 
 	describe("Test Deletion of Video", () => {
 		it("Should successfully delete the video from the server", done => {
-			request(sails.hooks.http.app)
+			agent
 				.del('/video/106000-cpy.mp4')
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(200, done);
