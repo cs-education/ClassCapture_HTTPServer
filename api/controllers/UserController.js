@@ -32,9 +32,7 @@ module.exports = {
 						password: creds.password // passwords are stripped from exec response
 					};
 
-					var token = jwt.sign(payload, JWT_SECRET, {
-						expiresIn: JWT_EXPIRATION
-					});
+					var token = AuthService.signPayload(payload);
 
 					res.cookie('user', token, {httpOnly: true});
 					res.json(user);
@@ -47,8 +45,6 @@ module.exports = {
 
 	me: (req, res) => {
 		if (req.user) {
-			sails.log("UserController.me\t pringint user");
-			sails.log(JSON.stringify(req.user, null, 2));
 			res.json(req.user);
 		} else {
 			res.negotiate(new StatusError(500, "Couldn't find user info"));
@@ -64,45 +60,24 @@ module.exports = {
 
 	register: (req, res) => {
 		var userInfo = req.body;
-		var hasRequiredAttrs = UserService.REQUIRED_USER_ATTRS.every(attr => _.has(userInfo, attr));
-		var hasInvalidAttrs = UserService.INVALID_REGISTRATION_ATTRS.some(attr => _.has(userInfo, attr));
 
-		if (!hasRequiredAttrs) {
-			res.negotiate(new StatusError(400, "Missing Some Required Attributes for Registration"));
-		} else if (hasInvalidAttrs) {
-			res.negotiate(new StatusError(400, `Cannot attatch the following properties upon registration: ${UserService.INVALID_REGISTRATION_ATTRS.join(", ")}`));
-		} else {
-			User.create(userInfo)
-			.exec((err, user) => {
-				if (err) {
-					res.negotiate(err);
-				} else {
-					user = _.clone(user); // if you don't clone, you wont be able to add sections and comments below
+		AuthService.registerNewUser(userInfo, (err, user) => {
+			if (err) {
+				return res.negotiate(err);
+			}
 
-					// Generate the cookie to be set on the client side
-					var payload = {
-						id: user.id,
-						email: user.email,
-						password: user.password // passwords are stripped from exec response
-					};
+			// Generate the cookie to be set on the client side
+			var payload = {
+				id: user.id,
+				email: user.email,
+				password: userInfo.password // passwords are stripped from registerNewUser response
+			};
 
-					var token = jwt.sign(payload, JWT_SECRET, {
-						expiresIn: JWT_EXPIRATION
-					});
+			var token = AuthService.signPayload(payload);
 
-					res.cookie('user', token, {httpOnly: true});
-
-					// Artificially attatch sections and comments empty lists to user object
-					user.sections = [];
-					user.comments = [];
-
-					// hide the password from the client
-					delete user.password;
-					
-					res.json(user);
-				}
-			});
-		}
+			res.cookie('user', token, {httpOnly: true});
+			res.json(user);
+		});
 	}
 };
 

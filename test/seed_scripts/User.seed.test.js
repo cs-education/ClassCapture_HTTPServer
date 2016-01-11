@@ -1,8 +1,9 @@
-var request = require('supertest');
-var chai    = require("chai");
-var Chance  = require('chance');
-var _       = require('sails/node_modules/lodash');
-var Promise = require('bluebird');
+var request    = require('supertest');
+var chai       = require("chai");
+var Chance     = require('chance');
+var _          = require('sails/node_modules/lodash');
+var Promise    = require('bluebird');
+var authHelper = require('../unit/test_helpers/authHelper');
 
 var chance = new Chance();
 var assert = chai.assert;
@@ -33,9 +34,22 @@ function range(start, end) {
 	return arr;
 }
 
+var agent = null; // to be populated in before hook
+
+before(done => {
+	authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+		if (err) {
+			return done(err);
+		}
+
+		agent = loggedInAgent;
+		done();
+	});
+});
+
 describe(`Should create ${NUM_USERS} users in the DB`, () => {
 	before('Retrieve Section Data', done => {
-		request(sails.hooks.http.app)
+		agent
 			.get('/section/')
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
@@ -60,7 +74,7 @@ describe(`Should create ${NUM_USERS} users in the DB`, () => {
 
 			var resUser = null;
 
-			request(sails.hooks.http.app)
+			agent
 				.post('/user/')
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send(user)
@@ -95,7 +109,7 @@ describe(`Should create ${NUM_USERS} users in the DB`, () => {
 	function getRecordingsForSection(section, cb) {
 		var sectionID = _.isNumber(section) ? section : section.id;
 		var recordings = [];
-		request(sails.hooks.http.app)
+		agent
 			.get(`/recording?section=${sectionID}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
@@ -120,7 +134,7 @@ describe(`Should create ${NUM_USERS} users in the DB`, () => {
 				var idx = 0;
 				async.forEach(users, (user, commentCb) => {
 					var time = start + ((end-start) * ((idx++) / users.length));
-					request(sails.hooks.http.app)
+					agent
 						.post('/comment/')
 						.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 						.send({

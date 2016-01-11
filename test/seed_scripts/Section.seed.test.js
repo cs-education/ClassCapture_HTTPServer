@@ -1,8 +1,9 @@
-var request = require('supertest');
-var chai    = require("chai");
-var Chance  = require('chance');
-var _       = require('sails/node_modules/lodash');
-var Promise = require('bluebird');
+var request    = require('supertest');
+var chai       = require("chai");
+var Chance     = require('chance');
+var _          = require('sails/node_modules/lodash');
+var Promise    = require('bluebird');
+var authHelper = require('../unit/test_helpers/authHelper');
 
 var chance = new Chance();
 var assert = chai.assert;
@@ -11,6 +12,19 @@ var should = chai.should();
 
 const NUM_SECTIONS_PER_COURSES = 1;
 
+var agent = null; // to be populated in before hook
+
+before(done => {
+	authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+		if (err) {
+			return done(err);
+		}
+
+		agent = loggedInAgent;
+		done();
+	});
+});
+
 describe(`Should create ${NUM_SECTIONS_PER_COURSES} Sections for each Course in the DB`, function() {
 	this.slow(30000);
 	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
@@ -18,7 +32,7 @@ describe(`Should create ${NUM_SECTIONS_PER_COURSES} Sections for each Course in 
 	var courses = [];
 	
 	before('Retrieve Course Data', function (done) {
-		request(sails.hooks.http.app)
+		agent
 			.get(`/course/`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
@@ -34,7 +48,7 @@ describe(`Should create ${NUM_SECTIONS_PER_COURSES} Sections for each Course in 
 			async.times(NUM_SECTIONS_PER_COURSES, (n, next) => {
 				var sectionName = chance.string({length: 3, pool: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'});
 
-				request(sails.hooks.http.app)
+				agent
 					.post('/section/')
 					.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 					.send({

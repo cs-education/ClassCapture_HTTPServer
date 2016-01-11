@@ -19,7 +19,7 @@ var expect = chai.expect;
 var should = chai.should();
 var chance = new Chance();
 
-const MOCK_DEVICE_ID = 'TEST';
+const MOCK_DEVICE_ID = chance.word({length: 10});
 
 describe('Simple Tests to make sure Authentication Works as Expected', () => {
 	var agent = null; // will be populated in before all hook
