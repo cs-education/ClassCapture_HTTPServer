@@ -17,23 +17,6 @@ const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
 var sections = [];
 var users = [];
 
-function range(start, end) {
-	if (_.isUndefined(end)) {
-		end = start;
-		start = 0;
-	}
-
-	var increment = start < end ? 1 : -1; 
-
-	var arr = [];
-	while (start < end) {
-		arr.push(start);
-		start += increment;
-	}
-
-	return arr;
-}
-
 var agent = null; // to be populated in before hook
 
 before(done => {
@@ -60,7 +43,7 @@ describe(`Should create ${NUM_USERS} users in the DB`, () => {
 	});
 
 	it(`Should create all ${NUM_USERS} users`, done => {
-		async.map(range(NUM_USERS), (idx, cb) => {
+		async.map(_.range(NUM_USERS), (idx, cb) => {
 			var name = chance.name().split(' ');
 			var user = {
 				email: chance.email({
@@ -68,14 +51,13 @@ describe(`Should create ${NUM_USERS} users in the DB`, () => {
 				}),
 				password: chance.word({length: 6}),
 				firstName: name[0], // get first name only
-				lastName: name[1],
-				sections: _.pluck(sections, 'id')
+				lastName: name[1]
 			};
 
 			var resUser = null;
 
 			agent
-				.post('/user/')
+				.post('/user/register')
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send(user)
 				.expect(res => {
@@ -87,6 +69,9 @@ describe(`Should create ${NUM_USERS} users in the DB`, () => {
 					resUser.firstName.should.equal(user.firstName);
 					resUser.should.have.property('lastName');
 					resUser.lastName.should.equal(user.lastName);
+
+					// attatch the password here
+					resUser.password = user.password;
 				})
 				.expect(201, err => {
 					if (err) {
@@ -102,6 +87,44 @@ describe(`Should create ${NUM_USERS} users in the DB`, () => {
 			}
 
 			users = createdUsers;
+			done();
+		});
+	});
+
+	function registerUserForSections(user, sections, cb) {
+		authHelper.getUserLoggedInAgent(sails.hooks.http.app, user, (err, agent) => {
+			if (err) {
+				return cb(err);
+			}
+
+			agent
+				.put(`/user/${user.id}`)
+				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
+				.send({
+					password: user.password,
+					sections: _.pluck(sections, 'id')
+				})
+				.expect(200)
+				.end((err, res) => {
+					if (err) {
+						cb(err);
+					} else {
+						var updatedUser = res.body;
+						updatedUser.password = user.password; // attach the password since its stripped in the response
+						cb(null, updatedUser);
+					}
+				});
+
+		});
+	}
+
+	it('Should register each user for all of the sections', done => {
+		async.map(users, (user, cb) => registerUserForSections(user, sections, cb), (err, updatedUsers) => {
+			if (err) {
+				return done(err);
+			}
+
+			users = updatedUsers;
 			done();
 		});
 	});
@@ -133,27 +156,31 @@ describe(`Should create ${NUM_USERS} users in the DB`, () => {
 
 				var idx = 0;
 				async.forEach(users, (user, commentCb) => {
-					var time = start + ((end-start) * ((idx++) / users.length));
-					agent
-						.post('/comment/')
-						.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
-						.send({
-							content: chance.sentence(),
-							time: new Date(time),
-							poster: user.id,
-							recording: recording.id
-						})
-						.expect(res => {
-							var comment = res.body;
-							comment.should.have.property('content');
-							comment.should.have.property('time');
-							time.should.equal(new Date(comment.time).getTime());
-							comment.should.have.property('poster');
-							comment.should.have.property('recording');
-						})
-						.expect(201, err => {
-							commentCb(err);
-						});
+					authHelper.getUserLoggedInAgent(sails.hooks.http.app, user, (err, agent) => {
+						if (err) {
+							return commentCb(err);
+						}
+
+						var time = start + ((end-start) * ((idx++) / users.length));
+						agent
+							.post('/comment/')
+							.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
+							.send({
+								content: chance.sentence(),
+								time: new Date(time),
+								poster: user.id,
+								recording: recording.id
+							})
+							.expect(res => {
+								var comment = res.body;
+								comment.should.have.property('content');
+								comment.should.have.property('time');
+								time.should.equal(new Date(comment.time).getTime());
+								comment.should.have.property('poster');
+								comment.should.have.property('recording');
+							})
+							.expect(201, commentCb);
+					});
 				}, cb);
 			}, done);
 		});

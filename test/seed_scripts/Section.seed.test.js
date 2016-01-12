@@ -10,7 +10,7 @@ var assert = chai.assert;
 var expect = chai.expect;
 var should = chai.should();
 
-const NUM_SECTIONS_PER_COURSES = 1;
+const NUM_SECTIONS_PER_COURSES = 2;
 
 var agent = null; // to be populated in before hook
 

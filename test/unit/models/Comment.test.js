@@ -5,24 +5,12 @@ var Chance     = require('chance');
 
 var chance = new Chance();
 
-var agent = null; // to be populated in before hook
+var agent = null; // to be populated in first test
 
 before(done => {
   // Drops database between each test.  This works because we use
   // the memory database
-  sails.once('hook:orm:reloaded', err => {
-    if (err) {
-      return done(err);
-    }
-    authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
-      if (err) {
-        return done(err);
-      }
-
-      agent = loggedInAgent;
-      done();
-    });
-  });
+  sails.once('hook:orm:reloaded', done);
   
   sails.emit('hook:orm:reload');
 });
@@ -35,6 +23,27 @@ describe('Test basic CRUD operations for Comment', function () {
   var recordingBody;
   var userBody;
   var commentBody;
+
+  it('Should create a user', function (done) {
+    agent = request.agent(sails.hooks.http.app); // will keep track of auth cookies
+
+    var name = chance.name().split(' ');
+    agent
+      .post('/user/register')
+      .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
+      .send({
+        firstName: name[0],
+        lastName: name[1],
+        email: chance.email({
+          domain: chance.pick(UserService.VALID_EMAIL_DOMAINS)
+        }),
+        password: chance.word({length: 6})
+      })
+      .expect(function (res) {
+        userBody = res.body;
+      })
+      .expect(201, done);
+  });
 
   it('Should create a course', function (done) {
     agent
@@ -79,25 +88,6 @@ describe('Test basic CRUD operations for Comment', function () {
       })
       .expect(function (res) {
         recordingBody = res.body;
-      })
-      .expect(201, done);
-  });
-
-  it('Should create a user', function (done) {
-    var name = chance.name().split(' ');
-    agent
-      .post('/user/')
-      .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
-      .send({
-        firstName: name[0],
-        lastName: name[1],
-        email: chance.email({
-          domain: chance.pick(UserService.VALID_EMAIL_DOMAINS)
-        }),
-        password: chance.word({length: 6})
-      })
-      .expect(function (res) {
-        userBody = res.body;
       })
       .expect(201, done);
   });

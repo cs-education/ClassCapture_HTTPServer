@@ -67,7 +67,7 @@ describe('Simple Tests to make sure Authentication Works as Expected', () => {
 				user.should.have.property('comments');
 				user.comments.length.should.equal(0);
 			})
-			.expect(200, done);
+			.expect(201, done);
 	});
 
 	it('Should fail to register the same user again', done => {

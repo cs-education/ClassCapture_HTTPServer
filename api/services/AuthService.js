@@ -27,7 +27,7 @@ exports.registerNewUser = (userInfo, cb) => {
 		});
 	} else if (hasInvalidAttrs) {
 		process.nextTick(() => {
-			cb(new StatusError(400, `Cannot attatch the following properties upon registration: ${UserService.INVALID_REGISTRATION_ATTRS.join(", ")}`));
+			cb(new StatusError(400, `Cannot attatch the following properties upon registration: ${INVALID_REGISTRATION_ATTRS.join(", ")}`));
 		});
 	} else {
 		User.create(userInfo)

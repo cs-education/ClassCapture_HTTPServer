@@ -34,7 +34,8 @@ module.exports.policies = {
   'UserController': {
     '*': 'isNotBlacklisted',
     'me': 'isAuthenticated',
-    'logout': 'isAuthenticated'
+    'logout': 'isAuthenticated',
+    'update': 'isAuthenticated'
   }
 
   /***************************************************************************

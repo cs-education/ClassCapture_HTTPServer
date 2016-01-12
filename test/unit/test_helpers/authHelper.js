@@ -17,7 +17,7 @@ exports.getLoggedInAgent = (app, cb) => {
 		password: chance.word({length: 6})
 	};
 
-	agent = request.agent(app);
+	var agent = request.agent(app);
 
 	agent
 		.post('/user/register')
@@ -38,6 +38,19 @@ exports.getLoggedInAgent = (app, cb) => {
 			user.sections.length.should.equal(0);
 			user.should.have.property('comments');
 			user.comments.length.should.equal(0);
+		})
+		.expect(201, err => cb(err, err ? null : agent));
+};
+
+exports.getUserLoggedInAgent = (app, user, cb) => {
+	var agent = request.agent(app);
+
+	agent
+		.post('/user/login')
+		.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
+		.send({
+			email: user.email,
+			password: user.password
 		})
 		.expect(200, err => cb(err, err ? null : agent));
 };
