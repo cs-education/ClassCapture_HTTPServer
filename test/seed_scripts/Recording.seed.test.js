@@ -1,10 +1,11 @@
-var request    = require('supertest');
-var chai       = require("chai");
-var Chance     = require('chance');
-var _          = require('sails/node_modules/lodash');
-var Promise    = require('bluebird');
-var fs         = require('fs');
-var authHelper = require('../unit/test_helpers/authHelper');
+var request           = require('supertest');
+var chai              = require("chai");
+var Chance            = require('chance');
+var _                 = require('sails/node_modules/lodash');
+var Promise           = require('bluebird');
+var fs                = require('fs');
+var authHelper        = require('../unit/test_helpers/authHelper');
+var ldapServiceMocker = require('../unit/test_helpers/ldapServiceMocker');
 
 var chance = new Chance();
 var assert = chai.assert;
@@ -32,6 +33,7 @@ function datesEqual(dateA, dateB) {
 var agent = null; // to be populated in before hook
 
 before(done => {
+	ldapServiceMocker.startMocking();
 	authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
 		if (err) {
 			return done(err);
