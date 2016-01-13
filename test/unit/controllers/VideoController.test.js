@@ -9,10 +9,11 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request    = require('supertest');
-var chai       = require("chai");
-var fs         = require('fs');
-var authHelper = require('../test_helpers/authHelper');
+var request           = require('supertest');
+var chai              = require("chai");
+var fs                = require('fs');
+var authHelper        = require('../test_helpers/authHelper');
+var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -27,6 +28,7 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 	var agent = null; // to be populated in before hook
 
 	before(done => {
+		ldapServiceMocker.startMocking();
 		authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
 			if (err) {
 				return done(err);
@@ -35,6 +37,11 @@ describe("Test Uploading, Downloading, & Deletion of Video", () => {
 			agent = loggedInAgent;
 			done();
 		});
+	});
+
+	after(done => {
+		ldapServiceMocker.stopMocking();
+		done();
 	});
 
 	describe("Test Uploading of Video", () => {

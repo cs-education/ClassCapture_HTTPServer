@@ -9,10 +9,11 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request = require('supertest');
-var chai    = require("chai");
-var fs      = require('fs');
-var Chance  = require('chance');
+var request           = require('supertest');
+var chai              = require("chai");
+var fs                = require('fs');
+var Chance            = require('chance');
+var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -29,6 +30,7 @@ describe('Simple Tests to make sure Authentication Works as Expected', () => {
 	var user = null; // to be populated in the registration test
 
 	before(done => {
+		ldapServiceMocker.startMocking(); // will bypass LDAP checking of NetID validity
 		agent = request.agent(sails.hooks.http.app); // used to persist cookies
 
 		var name = chance.name().split(' ');
@@ -44,6 +46,11 @@ describe('Simple Tests to make sure Authentication Works as Expected', () => {
 
 		sails.once('hook:orm:reloaded', done);
 		sails.emit('hook:orm:reload');
+	});
+
+	after(done => {
+		ldapServiceMocker.stopMocking(); // restore the service's original functionality
+		done();
 	});
 
 	it('Should register the user', done => {

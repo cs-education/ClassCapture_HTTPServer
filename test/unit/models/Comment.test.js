@@ -1,21 +1,29 @@
-var request    = require('supertest');
-var should     = require('chai').should();
-var authHelper = require('../test_helpers/authHelper');
-var Chance     = require('chance');
+var request           = require('supertest');
+var should            = require('chai').should();
+var authHelper        = require('../test_helpers/authHelper');
+var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
+var Chance            = require('chance');
 
 var chance = new Chance();
 
 var agent = null; // to be populated in first test
 
-before(done => {
-  // Drops database between each test.  This works because we use
-  // the memory database
-  sails.once('hook:orm:reloaded', done);
-  
-  sails.emit('hook:orm:reload');
-});
-
 describe('Test basic CRUD operations for Comment', function () {
+
+  before(done => {
+    ldapServiceMocker.startMocking(); // will bypass LDAP checking of NetID validity
+    // Drops database between each test.  This works because we use
+    // the memory database
+    sails.once('hook:orm:reloaded', done);
+    
+    sails.emit('hook:orm:reload');
+  });
+
+  after(done => {
+    ldapServiceMocker.stopMocking(); // restore the service's original functionality
+    done();
+  });
+
   const MOCK_DEVICE_ID = 'test';
 
   var courseBody;

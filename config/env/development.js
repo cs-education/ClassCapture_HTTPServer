@@ -21,6 +21,9 @@ module.exports = {
 	},
 	port: 8080,
 	jwtSecret: 'sup',
-	jwtExpiration: '1h'
+	jwtExpiration: '1h',
+
+	// points to actual UIUC LDAP Server
+	ldapUrl: 'ldaps://ldap.illinois.edu'
 
 };

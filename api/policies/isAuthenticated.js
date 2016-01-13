@@ -8,16 +8,15 @@ var jwt = require('jsonwebtoken');
 var StatusError = require('statuserror');
 
 module.exports = function (req, res, next) {
-	if (!_.has(req.cookies, 'user')) {
+	if (!_.has(req.cookies, AuthService.COOKIE_FIELD_NAME)) {
 		res.negotiate(new StatusError(403, 'No Login Credentials'));
 		return;
 	}
 
-	AuthService.verifyToken(req.cookies.user, (err, payload) => {
+	AuthService.verifyToken(req.cookies[AuthService.COOKIE_FIELD_NAME], (err, payload) => {
 		if (err) {
 			// Token must have expired
-			res.negotiate(new StatusError(401, 'Corrupt Credentials'));
-			return;
+			return res.negotiate(new StatusError(400, err.message || 'Corrupt Credentials'));
 		}
 
 		var id       = payload.id;
@@ -30,7 +29,7 @@ module.exports = function (req, res, next) {
 			if (err) {
 				res.negotiate(new StatusError(401, "Invalid Credentials"));
 			} else {
-				req.user = user;
+				req.user = _.clone(user);
 				next();
 			}
 		});

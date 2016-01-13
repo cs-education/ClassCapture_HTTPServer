@@ -28,16 +28,17 @@ module.exports = {
 				} if (_.isUndefined(user)) {
 					res.negotiate(new StatusError(401, "Invalid Credentials"));
 				} else {
-					var payload = {
+					var cookie = AuthService.getUserCookie({
 						id: user.id,
 						email: user.email,
-						password: creds.password // passwords are stripped from exec response
-					};
+						password: user.password
+					});
 
-					var token = AuthService.signPayload(payload);
+					var resUser = _.clone(user);
+					resUser = UserService.hideHiddenUserFields(resUser);
 
-					res.cookie('user', token, {httpOnly: true});
-					res.json(user);
+					res.cookie(AuthService.COOKIE_FIELD_NAME, cookie, {httpOnly: true});
+					res.json(resUser);
 				}
 			});
 		} else {
@@ -47,14 +48,15 @@ module.exports = {
 
 	me: (req, res) => {
 		if (req.user) {
-			res.json(req.user);
+			var resUser = UserService.hideHiddenUserFields(req.user);
+			res.json(resUser);
 		} else {
 			res.negotiate(new StatusError(404, "Couldn't find user info"));
 		}
 	},
 
 	logout: (req, res) => {
-		res.clearCookie('user');
+		res.clearCookie(AuthService.COOKIE_FIELD_NAME);
 		res.json({
 			message: "Logged Out"
 		});
@@ -68,16 +70,12 @@ module.exports = {
 				return res.negotiate(err);
 			}
 
-			// Generate the cookie to be set on the client side
-			var payload = {
-				id: user.id,
-				email: user.email,
-				password: userInfo.password // passwords are stripped from registerNewUser response
-			};
+			// Generate the cookie to be set on the client side cookie
+			var cookie = AuthService.getUserCookie(user);
 
-			var token = AuthService.signPayload(payload);
+			user = UserService.hideHiddenUserFields(user);
 
-			res.cookie('user', token, {httpOnly: true});
+			res.cookie(AuthService.COOKIE_FIELD_NAME, cookie, {httpOnly: true});
 			res.status(201);
 			res.json(user);
 		});
@@ -90,7 +88,7 @@ module.exports = {
 	update: (req, res) => {
 		var userID = parseInt(req.param("id"));
 		// First check that user is authenticated
-		if (!_.has(req, 'user')) {
+		if (!_.has(req, AuthService.COOKIE_FIELD_NAME)) {
 			return res.negotiate(new StatusError(400, "Must Be Logged in as the User you are trying to update"));
 		} else if (req.user.id !== userID) {
 			return res.negotiate(403, "Can only Make Updates to User that You are Logged in As");
@@ -131,7 +129,16 @@ module.exports = {
 							} else if (_.isUndefined(user)) {
 								res.negotiate(new StatusError(404, `Couldn't locate user with ID ${updatedUser.id}`));
 							} else {
-								res.json(user);
+								// Since the password may have changed, the cookies that the user has will no longer be valid
+								// Generate the cookie to be set on the client side cookie
+								var cookie = AuthService.getUserCookie(user);
+								// set the updated cookie
+								res.cookie(AuthService.COOKIE_FIELD_NAME, cookie, {httpOnly: true});
+
+								// Respond with the updated user
+								var resUser = _.clone(user);
+								resUser = UserService.hideHiddenUserFields(resUser);
+								res.json(resUser);
 							}
 						});
 					}

@@ -9,10 +9,11 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request    = require('supertest');
-var chai       = require("chai");
-var fs         = require('fs');
-var authHelper = require('../test_helpers/authHelper');
+var request           = require('supertest');
+var chai              = require("chai");
+var fs                = require('fs');
+var authHelper        = require('../test_helpers/authHelper');
+var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -24,6 +25,7 @@ describe('Simple operations with blacklist functionality', () => {
 	var agent = null; // to be populated in before hook
 
 	before(done => {
+		ldapServiceMocker.startMocking();
 		// Make sure there's nothing in the blacklist to begin with
 		BlacklistService.clearBlacklist(err => {
 			if (err) {
@@ -43,8 +45,8 @@ describe('Simple operations with blacklist functionality', () => {
 
 	after(done => {
 		// Make sure there's nothing in the blacklist at the end
-		
 		BlacklistService.clearBlacklist(done);
+		ldapServiceMocker.stopMocking();
 	});
 
 	describe('Test that no blacklisting occurs when blacklist is empty', () => {

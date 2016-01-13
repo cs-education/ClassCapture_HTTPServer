@@ -9,9 +9,10 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request    = require('supertest');
-var chai       = require("chai");
-var authHelper = require('../test_helpers/authHelper');
+var request           = require('supertest');
+var chai              = require("chai");
+var authHelper        = require('../test_helpers/authHelper');
+var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -38,27 +39,33 @@ function datesEqual(dateA, dateB) {
 
 var agent = null; // to be populated in before hook
 
-before(done => {
-	// Drops database between each test.  This works because we use
-	// the memory database
-	sails.once('hook:orm:reloaded', err => {
-		if (err) {
-			return done(err);
-		}
-		authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+describe("Test basic CRUD Ops in that order", function () {
+
+	before(done => {
+		ldapServiceMocker.startMocking();
+		// Drops database between each test.  This works because we use
+		// the memory database
+		sails.once('hook:orm:reloaded', err => {
 			if (err) {
 				return done(err);
 			}
+			authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+				if (err) {
+					return done(err);
+				}
 
-			agent = loggedInAgent;
-			done();
+				agent = loggedInAgent;
+				done();
+			});
 		});
+		
+		sails.emit('hook:orm:reload');
 	});
-	
-	sails.emit('hook:orm:reload');
-});
 
-describe("Test basic CRUD Ops in that order", function () {
+	after(done => {
+		ldapServiceMocker.stopMocking();
+		done();
+	});
 
 	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
 	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";

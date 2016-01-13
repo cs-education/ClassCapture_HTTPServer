@@ -5,6 +5,8 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var StatusError = require('statuserror');
+
 const MIN_PASSWORD_LENGTH = UserService.MIN_PASSWORD_LENGTH;
 const VALID_EMAIL_DOMAINS = UserService.VALID_EMAIL_DOMAINS;
 
@@ -52,7 +54,7 @@ module.exports = {
       var obj = this.toObject();
       
       // delete hidden fields
-      delete obj.password;
+      obj = UserService.hideHiddenUserFields(obj);
 
       return obj;
     }

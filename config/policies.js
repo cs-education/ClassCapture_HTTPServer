@@ -35,7 +35,8 @@ module.exports.policies = {
     '*': 'isNotBlacklisted',
     'me': 'isAuthenticated',
     'logout': 'isAuthenticated',
-    'update': 'isAuthenticated'
+    'register': 'isValidNetID',
+    'update': ['isAuthenticated', 'isValidNetID']
   }
 
   /***************************************************************************
