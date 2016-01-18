@@ -25,8 +25,11 @@ describe('Test Basic CRUD Operations for Courses', () => {
 
 	const courseDept = "CS";
 	const courseNum  = 225;
-  const badId = 2000000000;
-  const badDate = new Date(0);
+	const semester = "fall";
+	const year = 2015;
+
+	const badId = 2000000000;
+  	const badDate = new Date(0);
 
 	it('Should Create a Course', done => {
 		request(sails.hooks.http.app)
@@ -35,9 +38,11 @@ describe('Test Basic CRUD Operations for Courses', () => {
 			.send({
 				"department": courseDept,
 				"number": courseNum,
-        "id": badId,
-        "createdAt": badDate,
-        "updatedAt": badDate,
+				"semester": semester,
+				"year": year,
+		        "id": badId,
+		        "createdAt": badDate,
+		        "updatedAt": badDate
 			})
 			.expect(res => {
 				courseBody = res.body;
@@ -45,6 +50,10 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				courseBody.department.should.equal(courseDept);
 				courseBody.should.have.property('number');
 				courseBody.number.should.equal(courseNum);
+				courseBody.should.have.property('semester');
+				courseBody.semester.should.equal(semester);
+				courseBody.should.have.property('year');
+				courseBody.year.should.equal(year);
 				courseBody.should.have.property('id');
 
         // these attributes should not take on the bad values
@@ -71,7 +80,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 			.expect(200, done);
 	});
 
-	it('Should be able to update the course', done => {
+	it('Should not be able to update the course', done => {
 		const newCourseNum = 241;
 		
 		request(sails.hooks.http.app)
@@ -84,19 +93,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
         "createdAt": badDate,
         "updatedAt": badDate
 			})
-			.expect(res => {
-				// Check that parts of course that weren't supposed to change weren't changed
-				// The fields number and updatedAt are the only ones that should've changed
-				var newCourseStaticParts = _.omit(res.body, ['number', 'updatedAt']);
-				var oldCourseStaticParts = _.omit(courseBody, ['number', 'updatedAt']);
-				newCourseStaticParts.should.eql(oldCourseStaticParts);
-
-				// Update courseBody to have the latest changes
-				courseBody = res.body;
-				// Check that changes were made appropriately
-				courseBody.number.should.equal(newCourseNum);
-			})
-			.expect(200, done);
+			.expect(500, done);
 	});
 
 	it('Should be able to delete the course', done => {
@@ -116,5 +113,44 @@ describe('Test Basic CRUD Operations for Courses', () => {
 			.get(`/course/${courseBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(404, done);
+	});
+
+	// Now let's test a fail to create, invalid department first
+	const invalidCourseDept = "BCD";
+	it(`Should NOT create a Course Entry called "${invalidCourseDept} ${courseNum}, ${semester} ${year}"`, done => {
+		request(sails.hooks.http.app)
+			.post('/course/')
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
+			.send({
+				"department": invalidCourseDept,
+				"number": courseNum,
+				"year": year,
+				"semester": semester
+			})
+			.expect(res => {
+				res.body.error.should.equal('E_UNKNOWN');
+				res.body.status.should.equal(500);;
+			})
+			.expect(500, done)
+	});
+
+	// Now test valid course, invalid semester. CS 410 is offered spring only
+	const invalidSemesterCourseNum = 410;
+	const invalidSemester = "fall";
+	it(`Should NOT create a Course Entry called "${courseDept} ${invalidSemesterCourseNum}, ${invalidSemester} ${year}"`, done => {
+		request(sails.hooks.http.app)
+			.post('/course/')
+			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
+			.send({
+				"department": courseDept,
+				"number": invalidSemesterCourseNum,
+				"year": year,
+				"semester": invalidSemester
+			})
+			.expect(res => {
+				res.body.error.should.equal('E_UNKNOWN');
+				res.body.status.should.equal(500);;
+			})
+			.expect(500, done)
 	});
 });

@@ -2,7 +2,7 @@
 * Course.js
 *
 * @description :: Schema for Courses with relevant course metadata and linking to specific course sections
-* @docs        :: http://sailsjs.org/#!documentation/models
+* @docs        : http://sailsjs.org/#!documentation/models
 */
 
 const DEPT_MIN_LENGTH = 2;
@@ -28,7 +28,32 @@ module.exports = {
 		"sections": { // Example: CS 225 may have 2 lecture sections, 5 lab sections, & 5 discussion sections
 			"collection": "Section",
 			"via": "course"
-		}
+		},
+		"year": { // Example: CS 225 in the year 2015
+			"type": "integer",
+			"required": true
+		},
+		"semester": { // Example: fall, spring, or summer semesters.
+			"type": "string",
+			"enum": ["spring", "summer", "fall"],
+			"required" : true
+		},
+	},
+
+	// Lifecycle Callbacks
+	beforeCreate: function(values, next){
+		CatalogValidationService.isValidCourse(values, function (err, isValid) {
+			if(!err){
+				next();
+			}
+			else{
+				next(err);
+			}
+		})
+	},
+	beforeUpdate: function (values, next) {
+		var StatusError = require("statuserror");
+		next(new StatusError(400, "Course Entries Cannot Be Modified")); 
 	}
 };
 
