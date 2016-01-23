@@ -63,11 +63,11 @@ Look at `api/models/Course.js` for a concrete, up to date representation of this
 		- The semester, which can either be in ['spring', 'summer', 'fall']
 	
 ### Section
-Look at `api/models/Section.js` for a concrete, up to date representation of this model. A Section contains basic metadqta for a Section that is part of a course.
+Look at `api/models/Section.js` for a concrete, up to date representation of this model. A Section contains basic metadata for a Section that is part of a course.
 
 - Attributes
 	- `startTime`
-		- Starting time for the section. The date for this value is scaled back to epoch *(Jan 1st, 1970)*, however, the time of the value is preserved. For example: 1 PM on November 5th, 2015 is scaled back to 1 PM on January 1st, 1990.
+		- Starting time for the section. The date for this value is scaled back to epoch *(Jan 1st, 1970)*, however, the time of the value is preserved. For example: 1 PM on November 5th, 2015 is scaled back to 1 PM on January 1st, 1970.
 		- Type: `Datetime`
 		- Required
 	- `endTime`
