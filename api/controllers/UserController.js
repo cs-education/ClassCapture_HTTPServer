@@ -85,13 +85,27 @@ module.exports = {
 		res.negotiate(new StatusError(404, "Can't use this endpoint to create users. Please use '/user/register' instead"));
 	},
 
+	delete: (req, res) => {
+		if (req.user) {
+			var userID = parseInt(req.param("id"));
+			User.destroy(userID).exec(err => {
+				if (err) {
+					res.negotiate(err);
+				} else {
+					var deletedUser = UserService.hideHiddenUserFields(req.user);
+					res.json(deletedUser);
+				}
+			});
+		} else {
+			res.negotiate(400, "Couldn't find user info");
+		}
+	},
+
 	update: (req, res) => {
 		var userID = parseInt(req.param("id"));
 		// First check that user is authenticated
 		if (!_.has(req, AuthService.COOKIE_FIELD_NAME)) {
 			return res.negotiate(new StatusError(400, "Must Be Logged in as the User you are trying to update"));
-		} else if (req.user.id !== userID) {
-			return res.negotiate(403, "Can only Make Updates to User that You are Logged in As");
 		} else {
 			var updatedInfo = req.body || {};
 

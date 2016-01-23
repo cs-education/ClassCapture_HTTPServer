@@ -33,10 +33,11 @@ module.exports.policies = {
   'SectionController': ['isNotBlacklisted', 'isAuthenticated'],
   'UserController': {
     '*': 'isNotBlacklisted',
-    'me': 'isAuthenticated',
-    'logout': 'isAuthenticated',
-    'register': 'isValidNetID',
-    'update': ['isAuthenticated', 'isValidNetID']
+    'me': ['isNotBlacklisted', 'isAuthenticated'],
+    'logout': ['isNotBlacklisted', 'isAuthenticated'],
+    'register': ['isNotBlacklisted', 'isValidNetID'],
+    'delete': ['isNotBlacklisted', 'isAuthenticated', 'isUpdatingLoggedInUser'],
+    'update': ['isNotBlacklisted', 'isAuthenticated', 'isUpdatingLoggedInUser', 'isValidNetID']
   }
 
   /***************************************************************************

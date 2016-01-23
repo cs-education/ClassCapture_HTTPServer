@@ -14,6 +14,8 @@ var client = ldap.createClient({
 });
 
 exports.isValidNetID = (netID, cb) => {
+	cb = _.once(cb); // just to make sure cb is only called once
+	
 	var opts = {
 		scope: 'sub',
 		filter: `uid=${netID}`,
@@ -21,41 +23,45 @@ exports.isValidNetID = (netID, cb) => {
 		sizeLimit: 1, // only want at max 1 result back
 	};
 
-	client.search(SEARCH_BASE, opts, (err, res) => {
-		if (err) {
-			sails.log(err);
-			cb(false);
-		} else {
-			var err = null;
-			var foundMatch = false;
+	try {
+		client.search(SEARCH_BASE, opts, (err, res) => {
+			if (err) {
+				sails.log(err);
+				cb(false);
+			} else {
+				var err = null;
+				var foundMatch = false;
 
-			res.on('searchEntry', function(entry) {
-				var attrs = entry.json.attributes;
-				var netIDAttr = _.findWhere(attrs, {type: NETID_ATTR_NAME});
+				res.on('searchEntry', function(entry) {
+					var attrs = entry.json.attributes;
+					var netIDAttr = _.findWhere(attrs, {type: NETID_ATTR_NAME});
 
-				if (netIDAttr) {
-					var resultNetID = _.first(netIDAttr.vals);
-					foundMatch = netID === resultNetID;
-				}
-			});
+					if (netIDAttr) {
+						var resultNetID = _.first(netIDAttr.vals);
+						foundMatch = netID === resultNetID;
+					}
+				});
 
-			res.on('error', function(error) {
-				err = error;
-			});
+				res.on('error', function(error) {
+					err = error;
+				});
 
-			res.on('end', function(result) {
-				if (err) {
-					cb(false);
-				} else if (result.status !== 0) { // status code 0 indicates success
-					cb(false);
-					sails.log(`Got a status code of ${result.status} from LDAP Search Request`);
-					sails.log(result);
-				} else {
-					cb(foundMatch);
-				}
-			});
-		}
-	});
+				res.on('end', function(result) {
+					if (err) {
+						cb(false);
+					} else if (result.status !== 0) { // status code 0 indicates success
+						cb(false);
+						sails.log(`Got a status code of ${result.status} from LDAP Search Request`);
+						sails.log(result);
+					} else {
+						cb(foundMatch);
+					}
+				});
+			}
+		});
+	} catch (err) {
+		cb(err);
+	}
 };
 
 exports.extractNetIDFromEmail = email => {
