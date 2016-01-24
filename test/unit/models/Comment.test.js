@@ -1,8 +1,9 @@
-var request           = require('supertest');
-var should            = require('chai').should();
-var authHelper        = require('../test_helpers/authHelper');
-var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
-var Chance            = require('chance');
+var request              = require('supertest');
+var should               = require('chai').should();
+var authHelper           = require('../test_helpers/authHelper');
+var ldapServiceMocker    = require('../test_helpers/ldapServiceMocker');
+var catalogServiceMocker = require('../test_helpers/catalogServiceMocker');
+var Chance               = require('chance');
 
 var chance = new Chance();
 
@@ -12,6 +13,7 @@ describe('Test basic CRUD operations for Comment', function () {
 
   before(done => {
     ldapServiceMocker.startMocking(); // will bypass LDAP checking of NetID validity
+    catalogServiceMocker.startMocking();
     // Drops database between each test.  This works because we use
     // the memory database
     sails.once('hook:orm:reloaded', done);
@@ -21,6 +23,7 @@ describe('Test basic CRUD operations for Comment', function () {
 
   after(done => {
     ldapServiceMocker.stopMocking(); // restore the service's original functionality
+    catalogServiceMocker.stopMocking();
     done();
   });
 
@@ -59,12 +62,20 @@ describe('Test basic CRUD operations for Comment', function () {
       .set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
       .send({
         department: 'CS',
-        number: 225
+        number: 225,
+        semester: 'spring',
+        year: 2015
       })
       .expect(function (res) {
         courseBody = res.body;
       })
-      .expect(201, done);
+      .expect(201)
+      .end((err, res) => {
+        if (err) {
+          console.log(JSON.stringify(res.body));
+        }
+        done(err);
+      });
   });
 
   it('Should create a section', function (done) {

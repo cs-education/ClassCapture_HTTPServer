@@ -9,10 +9,11 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request           = require('supertest');
-var chai              = require("chai");
-var authHelper        = require('../test_helpers/authHelper');
-var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
+var request              = require('supertest');
+var chai                 = require("chai");
+var authHelper           = require('../test_helpers/authHelper');
+var ldapServiceMocker    = require('../test_helpers/ldapServiceMocker');
+var catalogServiceMocker = require('../test_helpers/catalogServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -24,6 +25,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 
 	before(done => {
 		ldapServiceMocker.startMocking();
+		catalogServiceMocker.startMocking();
 		// Drops database between each test.  This works because we use
 		// the memory database
 		sails.once('hook:orm:reloaded', err => {
@@ -45,6 +47,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 
 	after(done => {
 		ldapServiceMocker.stopMocking();
+		catalogServiceMocker.stopMocking();
 		done();
 	});
 
@@ -158,11 +161,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				"year": year,
 				"semester": semester
 			})
-			.expect(res => {
-				res.body.error.should.equal('E_UNKNOWN');
-				res.body.status.should.equal(500);;
-			})
-			.expect(500, done)
+			.expect(403, done)
 	});
 
 	// Now test valid course, invalid semester. CS 410 is offered spring only
@@ -178,10 +177,6 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				"year": year,
 				"semester": invalidSemester
 			})
-			.expect(res => {
-				res.body.error.should.equal('E_UNKNOWN');
-				res.body.status.should.equal(500);;
-			})
-			.expect(500, done)
+			.expect(403, done)
 	});
 });

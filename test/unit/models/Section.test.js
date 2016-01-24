@@ -13,6 +13,7 @@ var request           = require('supertest');
 var chai              = require("chai");
 var authHelper        = require('../test_helpers/authHelper');
 var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
+var catalogServiceMocker = require('../test_helpers/catalogServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -37,6 +38,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 
 	before(done => {
 		ldapServiceMocker.startMocking();
+		catalogServiceMocker.startMocking();
 		// Drops database between each test.  This works because we use
 		// the memory database
 		sails.once('hook:orm:reloaded', err => {
@@ -58,6 +60,7 @@ describe('Basic CRUD Tests for Section Object', () => {
 
 	after(done => {
 		ldapServiceMocker.stopMocking();
+		catalogServiceMocker.stopMocking();
 		done();
 	});
 
@@ -68,15 +71,17 @@ describe('Basic CRUD Tests for Section Object', () => {
 	var sectionBody = null; // to be populated and modified by tests
 
 	const courseDept = "CS";
-	const courseNum  = 225;
+	const courseNum  = 241;
 
 	it('Should Create a Course', done => {
 		agent
 			.post('/course/')
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
-				"department": "CS",
-				"number": 225
+				"department": courseDept,
+				"number": courseNum,
+				"semester": 'spring',
+				"year": 2015
 			})
 			.expect(res => {
 				courseBody = res.body;

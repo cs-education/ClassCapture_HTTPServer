@@ -124,6 +124,9 @@ You can also do complex queries with the API. The [Sails JS Docs on this topic](
 
 ## Dev Tips
 
+### Testing
+- Quick tip: If you're banging you're head against a failing test case, try cleaning the database (`npm run clean`) and then running the tests again (`npm test`).
+
 ### Database Seeding for Development
 - I've added some seed scripts to help out with development. These scripts will prepopulate the database with entries for each of the `Course`, `Section`, `Recording` objects. These scripts can be found in the `test/seed_scripts` directory.
 - To run a seed script, like `test/seed_scripts/Course.seed.test.js`, you can do so by typing `mocha test/bootstrap.test.js test/seed_scripts/Course.seed.test.js`. This must be done in the base directory of the project (same level as `package.json`).

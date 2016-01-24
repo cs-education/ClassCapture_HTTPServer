@@ -4,6 +4,7 @@ var Chance            = require('chance');
 var _                 = require('sails/node_modules/lodash');
 var authHelper        = require('../unit/test_helpers/authHelper');
 var ldapServiceMocker = require('../unit/test_helpers/ldapServiceMocker');
+var catalogServiceMocker = require('../unit/test_helpers/catalogServiceMocker');
 
 var chance = new Chance();
 var assert = chai.assert;
@@ -16,6 +17,7 @@ var agent = null; // to be populated in before hook
 
 before(done => {
 	ldapServiceMocker.startMocking();
+	catalogServiceMocker.startMocking();
 	authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
 		if (err) {
 			return done(err);

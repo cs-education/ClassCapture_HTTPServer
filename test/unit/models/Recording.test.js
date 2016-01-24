@@ -13,6 +13,7 @@ var request           = require('supertest');
 var chai              = require("chai");
 var authHelper        = require('../test_helpers/authHelper');
 var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
+var catalogServiceMocker = require('../test_helpers/catalogServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -43,6 +44,7 @@ describe("Test basic CRUD Ops in that order", function () {
 
 	before(done => {
 		ldapServiceMocker.startMocking();
+		catalogServiceMocker.startMocking();
 		// Drops database between each test.  This works because we use
 		// the memory database
 		sails.once('hook:orm:reloaded', err => {
@@ -64,6 +66,7 @@ describe("Test basic CRUD Ops in that order", function () {
 
 	after(done => {
 		ldapServiceMocker.stopMocking();
+		catalogServiceMocker.stopMocking();
 		done();
 	});
 
@@ -83,6 +86,8 @@ describe("Test basic CRUD Ops in that order", function () {
 				.send({
 					"department": "CS",
 					"number": 225,
+					"semester": 'spring',
+					"year": 2015
 				})
 				.expect(function (res) {
 					courseBody = res.body;

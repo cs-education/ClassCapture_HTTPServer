@@ -24,6 +24,7 @@
     "ldapjs": "^1.0.0",
     "lodash": "^3.10.1",
     "rc": "~0.5.0",
+    "request": "^2.67.0",
     "sails": "~0.11.0",
     "sails-disk": "~0.10.0",
     "sails-postgresql": "^0.10.16",
