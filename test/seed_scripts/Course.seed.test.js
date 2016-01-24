@@ -42,7 +42,9 @@ describe(`Create ${NUM_COURSES} Course Entries`, () => {
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
 					"department": courseDept,
-					"number": courseNum
+					"number": courseNum,
+					"semester": chance.pick(["spring", "summer", "fall"]),
+					"year": chance.integer({min: 2013, max: 2015})
 				})
 				.expect(res => {
 					var courseBody = res.body;
