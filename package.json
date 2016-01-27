@@ -36,6 +36,7 @@
     "start": "node app.js",
     "test": "mocha test/bootstrap.test.js test/unit/**/*.test.js",
     "seed": "mocha test/bootstrap.test.js test/seed_scripts/Course.seed.test.js test/seed_scripts/Section.seed.test.js test/seed_scripts/Recording.seed.test.js test/seed_scripts/User.seed.test.js",
+    "util": "mocha -t 120000",
     "clean": "(rm .tmp/localDiskDb.db & rm ~/classcapture_videos/* & echo '{}' > assets/blacklist.json) && echo 'Cleaned up Development Environment'"
   },
   "main": "app.js",
