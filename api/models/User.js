@@ -20,10 +20,9 @@ module.exports = {
 
   attributes: {
     email: {
-      type: 'string',
+      type: 'email',
       required: true,
       unique: true,
-      email: true,
       isExpectedEmailDomain: true
     },
     password: {
