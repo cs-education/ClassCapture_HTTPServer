@@ -26,7 +26,19 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  '*': 'deviceBlacklistPolicy'
+  'BlacklistController': ['isNotBlacklisted', 'isAuthenticated'],
+  'CommentController': ['isNotBlacklisted', 'isAuthenticated'],
+  'CourseController': ['isNotBlacklisted', 'isAuthenticated'],
+  'RecordingController': ['isNotBlacklisted', 'isAuthenticated'],
+  'SectionController': ['isNotBlacklisted', 'isAuthenticated'],
+  'UserController': {
+    '*': 'isNotBlacklisted',
+    'me': ['isNotBlacklisted', 'isAuthenticated'],
+    'logout': ['isNotBlacklisted', 'isAuthenticated'],
+    'register': ['isNotBlacklisted', 'isValidNetID'],
+    'delete': ['isNotBlacklisted', 'isAuthenticated', 'isUpdatingLoggedInUser'],
+    'update': ['isNotBlacklisted', 'isAuthenticated', 'isUpdatingLoggedInUser', 'isValidNetID']
+  }
 
   /***************************************************************************
   *                                                                          *

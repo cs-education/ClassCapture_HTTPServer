@@ -56,6 +56,15 @@ module.exports.routes = {
   'get /blacklist': 'BlacklistController.getBlacklistIDs',
   'get /blacklist/:id': 'BlacklistController.isInBlacklist',
   'put /blacklist/:id': 'BlacklistController.addToBlacklist',
-  'delete /blacklist/:id': 'BlacklistController.removeFromBlacklist'
+  'delete /blacklist/:id': 'BlacklistController.removeFromBlacklist',
+
+  // Routes for user authentication in UserController.js
+  'post /user/login': 'UserController.login',
+  'get /user/me': 'UserController.me',
+  'post /user/logout': 'UserController.logout',
+  'post /user/register': 'UserController.register',
+  'post /user': 'UserController.createUser',
+  'delete /user/:id': 'UserController.delete',
+  'put /user/:id': 'UserController.update'
 
 };

@@ -9,8 +9,11 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request = require('supertest');
-var chai    = require("chai");
+var request           = require('supertest');
+var chai              = require("chai");
+var authHelper        = require('../test_helpers/authHelper');
+var ldapServiceMocker = require('../test_helpers/ldapServiceMocker');
+var catalogServiceMocker = require('../test_helpers/catalogServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
@@ -35,7 +38,37 @@ function datesEqual(dateA, dateB) {
 	return dateA.getTime() == dateB.getTime();
 }
 
+var agent = null; // to be populated in before hook
+
 describe("Test basic CRUD Ops in that order", function () {
+
+	before(done => {
+		ldapServiceMocker.startMocking();
+		catalogServiceMocker.startMocking();
+		// Drops database between each test.  This works because we use
+		// the memory database
+		sails.once('hook:orm:reloaded', err => {
+			if (err) {
+				return done(err);
+			}
+			authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+				if (err) {
+					return done(err);
+				}
+
+				agent = loggedInAgent;
+				done();
+			});
+		});
+		
+		sails.emit('hook:orm:reload');
+	});
+
+	after(done => {
+		ldapServiceMocker.stopMocking();
+		catalogServiceMocker.stopMocking();
+		done();
+	});
 
 	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
 	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
@@ -47,12 +80,14 @@ describe("Test basic CRUD Ops in that order", function () {
 	// First create a course & section to link the recordings with
 	describe('Create course', function () {
 		it('Should create a new course entry', done => {
-			request(sails.hooks.http.app)
+			agent
 				.post('/course/')
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
 					"department": "CS",
 					"number": 225,
+					"semester": 'spring',
+					"year": 2015
 				})
 				.expect(function (res) {
 					courseBody = res.body;
@@ -67,7 +102,7 @@ describe("Test basic CRUD Ops in that order", function () {
 
 	describe('Create section under course', function () {
 		it('Should create a new section under the course entry', done => {
-			request(sails.hooks.http.app)
+			agent
 				.post('/section/')
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
@@ -90,7 +125,7 @@ describe("Test basic CRUD Ops in that order", function () {
 			var dates = getDates();
 			assert.isBelow(dates.start, dates.end, "startTime is not below endTime");
 
-			request(sails.hooks.http.app)
+			agent
 				.post('/recording/')
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
@@ -114,7 +149,7 @@ describe("Test basic CRUD Ops in that order", function () {
 
 	describe("read", function () {
 		it("Should grab the record that was just created and check that it hasn't changed", done => {
-			request(sails.hooks.http.app)
+			agent
 				.get(`/recording/${recordingBody.id}`)
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(res => {
@@ -139,7 +174,7 @@ describe("Test basic CRUD Ops in that order", function () {
 			var newEndTime = new Date(recordingBody.endTime);
 			newEndTime.setYear(newEndTime.getFullYear() + 1); // increment year
 
-			request(sails.hooks.http.app)
+			agent
 				.put("/recording/" + recordingBody.id)
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.send({
@@ -157,7 +192,7 @@ describe("Test basic CRUD Ops in that order", function () {
 
 	describe("delete", function () {
 		it("Should delete the record that was just updated", done => {
-			request(sails.hooks.http.app)
+			agent
 				.del("/recording/" + recordingBody.id)
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(res => {
@@ -168,7 +203,7 @@ describe("Test basic CRUD Ops in that order", function () {
 		});
 
 		it('Should get a Not Found response when trying to fetch the recording that was just deleted', done => {
-			request(sails.hooks.http.app)
+			agent
 				.get(`/recording/${recordingBody.id}`)
 				.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 				.expect(404, done);

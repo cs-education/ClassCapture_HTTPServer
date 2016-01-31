@@ -16,10 +16,14 @@ module.exports = {
    * Set the default database connection for models in the development       *
    * environment (see config/connections.js and config/models.js )           *
    ***************************************************************************/
-
 	models: {
 		connection: 'localDiskDb'
 	},
-	port: 8080
+	port: 8080,
+	jwtSecret: 'sup',
+	jwtExpiration: '1h',
+
+	// points to actual UIUC LDAP Server
+	ldapUrl: 'ldaps://ldap.illinois.edu'
 
 };

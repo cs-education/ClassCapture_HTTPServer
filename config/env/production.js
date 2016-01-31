@@ -35,4 +35,10 @@ module.exports = {
   //   level: "silent"
   // }
 
+  jwtSecret: 'hakunamatata1984',
+  jwtExpiration: '20 days',
+
+  // Points to actual UIUC LDAP Server
+  ldapUrl: 'ldaps://ldap.illinois.edu'
+
 };

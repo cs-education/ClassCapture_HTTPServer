@@ -9,14 +9,47 @@
  * More info on Testing in Sails: http://sailsjs.org/#!/documentation/concepts/Testing
  */
 
-var request = require('supertest');
-var chai      = require("chai");
+var request              = require('supertest');
+var chai                 = require("chai");
+var authHelper           = require('../test_helpers/authHelper');
+var ldapServiceMocker    = require('../test_helpers/ldapServiceMocker');
+var catalogServiceMocker = require('../test_helpers/catalogServiceMocker');
 
 var assert = chai.assert;
 var expect = chai.expect;
 var should = chai.should();
 
+var agent = null; // to be populated in before hook
+
 describe('Test Basic CRUD Operations for Courses', () => {
+
+	before(done => {
+		ldapServiceMocker.startMocking();
+		catalogServiceMocker.startMocking();
+		// Drops database between each test.  This works because we use
+		// the memory database
+		sails.once('hook:orm:reloaded', err => {
+			if (err) {
+				return done(err);
+			}
+			authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+				if (err) {
+					return done(err);
+				}
+
+				agent = loggedInAgent;
+				done();
+			});
+		});
+
+		sails.emit('hook:orm:reload');
+	});
+
+	after(done => {
+		ldapServiceMocker.stopMocking();
+		catalogServiceMocker.stopMocking();
+		done();
+	});
 
 	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
 	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
@@ -25,6 +58,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 
 	const courseDept = "CS";
 	const courseNum  = 225;
+
 	const semester = "fall";
 	const year = 2015;
 
@@ -32,7 +66,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
   	const badDate = new Date(0);
 
 	it('Should Create a Course', done => {
-		request(sails.hooks.http.app)
+		agent
 			.post('/course/')
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
@@ -56,10 +90,10 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				courseBody.year.should.equal(year);
 				courseBody.should.have.property('id');
 
-        // these attributes should not take on the bad values
-        courseBody.id.should.not.equal(badId);
-        courseBody.createdAt.should.not.equal(badDate);
-        courseBody.updatedAt.should.not.equal(badDate);
+		        // these attributes should not take on the bad values
+		        courseBody.id.should.not.equal(badId);
+		        courseBody.createdAt.should.not.equal(badDate);
+		        courseBody.updatedAt.should.not.equal(badDate);
 
 				// Upon creation, the returned object doesn't have the sections property
 				// Manually add it here so it can be referenced in future tests
@@ -69,7 +103,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 	});
 
 	it('Should be able to read the course', done => {
-		request(sails.hooks.http.app)
+		agent
 			.get(`/course/${courseBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
@@ -83,21 +117,21 @@ describe('Test Basic CRUD Operations for Courses', () => {
 	it('Should not be able to update the course', done => {
 		const newCourseNum = 241;
 		
-		request(sails.hooks.http.app)
+		agent
 			.put(`/course/${courseBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.send({
 				"number": newCourseNum,
-        "extraAttribute": "extraAttribute",
-        "id": badId,
-        "createdAt": badDate,
-        "updatedAt": badDate
+		        "extraAttribute": "extraAttribute",
+		        "id": badId,
+		        "createdAt": badDate,
+		        "updatedAt": badDate
 			})
 			.expect(500, done);
 	});
 
 	it('Should be able to delete the course', done => {
-		request(sails.hooks.http.app)
+		agent
 			.del(`/course/${courseBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
@@ -109,7 +143,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 	});
 
 	it('Should get Not Found response when trying to read the deleted course', done => {
-		request(sails.hooks.http.app)
+		agent
 			.get(`/course/${courseBody.id}`)
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(404, done);
@@ -127,11 +161,7 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				"year": year,
 				"semester": semester
 			})
-			.expect(res => {
-				res.body.error.should.equal('E_UNKNOWN');
-				res.body.status.should.equal(500);;
-			})
-			.expect(500, done)
+			.expect(403, done)
 	});
 
 	// Now test valid course, invalid semester. CS 410 is offered spring only
@@ -147,10 +177,6 @@ describe('Test Basic CRUD Operations for Courses', () => {
 				"year": year,
 				"semester": invalidSemester
 			})
-			.expect(res => {
-				res.body.error.should.equal('E_UNKNOWN');
-				res.body.status.should.equal(500);;
-			})
-			.expect(500, done)
+			.expect(403, done)
 	});
 });

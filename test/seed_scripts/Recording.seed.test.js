@@ -1,9 +1,11 @@
-var request = require('supertest');
-var chai    = require("chai");
-var Chance  = require('chance');
-var _       = require('sails/node_modules/lodash');
-var Promise = require('bluebird');
-var fs      = require('fs');
+var request           = require('supertest');
+var chai              = require("chai");
+var Chance            = require('chance');
+var _                 = require('sails/node_modules/lodash');
+var Promise           = require('bluebird');
+var fs                = require('fs');
+var authHelper        = require('../unit/test_helpers/authHelper');
+var ldapServiceMocker = require('../unit/test_helpers/ldapServiceMocker');
 
 var chance = new Chance();
 var assert = chai.assert;
@@ -28,13 +30,27 @@ function datesEqual(dateA, dateB) {
 	return dateA.getTime() == dateB.getTime();
 }
 
+var agent = null; // to be populated in before hook
+
+before(done => {
+	ldapServiceMocker.startMocking();
+	authHelper.getLoggedInAgent(sails.hooks.http.app, (err, loggedInAgent) => {
+		if (err) {
+			return done(err);
+		}
+
+		agent = loggedInAgent;
+		done();
+	});
+});
+
 describe(`Should create ${NUM_RECORDINGS_PER_SECTION} Recordings for each Section`, () => {
 	// Make sure that you've added a DeviceID to each request to pass the Blacklisting policy
 	const MOCK_DEVICE_ID = "TESTTEST$$TESTTEST";
 	var sections = [];
 
 	before('Retrieve Sections Data', function (done) {
-		request(sails.hooks.http.app)
+		agent
 			.get('/section/')
 			.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 			.expect(res => {
@@ -53,7 +69,7 @@ describe(`Should create ${NUM_RECORDINGS_PER_SECTION} Recordings for each Sectio
 				var endTime = new Date(startTime.getTime() + videoFile.duration);
 				var createdRecording = null;
 
-				request(sails.hooks.http.app)
+				agent
 					.post('/recording/')
 					.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 					.send({
@@ -76,7 +92,7 @@ describe(`Should create ${NUM_RECORDINGS_PER_SECTION} Recordings for each Sectio
 							next(err);
 						}
 
-						request(sails.hooks.http.app)
+						agent
 							.post(`/video/${createdRecording.filename}`)
 							.set(BlacklistService.DEVICE_ID_HEADER_NAME, MOCK_DEVICE_ID)
 							.attach("video", videoFile.path)

@@ -63,11 +63,11 @@ Look at `api/models/Course.js` for a concrete, up to date representation of this
 		- The semester, which can either be in ['spring', 'summer', 'fall']
 	
 ### Section
-Look at `api/models/Section.js` for a concrete, up to date representation of this model. A Section contains basic metadqta for a Section that is part of a course.
+Look at `api/models/Section.js` for a concrete, up to date representation of this model. A Section contains basic metadata for a Section that is part of a course.
 
 - Attributes
 	- `startTime`
-		- Starting time for the section. The date for this value is scaled back to epoch *(Jan 1st, 1970)*, however, the time of the value is preserved. For example: 1 PM on November 5th, 2015 is scaled back to 1 PM on January 1st, 1990.
+		- Starting time for the section. The date for this value is scaled back to epoch *(Jan 1st, 1970)*, however, the time of the value is preserved. For example: 1 PM on November 5th, 2015 is scaled back to 1 PM on January 1st, 1970.
 		- Type: `Datetime`
 		- Required
 	- `endTime`
@@ -123,6 +123,9 @@ Just some more info on how to interact with the video storage system through the
 You can also do complex queries with the API. The [Sails JS Docs on this topic](http://sailsjs.org/documentation/reference/blueprint-api/find-where) give a good overview on how to do this.
 
 ## Dev Tips
+
+### Testing
+- Quick tip: If you're banging you're head against a failing test case, try cleaning the database (`npm run clean`) and then running the tests again (`npm test`).
 
 ### Database Seeding for Development
 - I've added some seed scripts to help out with development. These scripts will prepopulate the database with entries for each of the `Course`, `Section`, `Recording` objects. These scripts can be found in the `test/seed_scripts` directory.

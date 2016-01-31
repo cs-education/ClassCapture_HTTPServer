@@ -9,9 +9,13 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.bootstrap.html
  */
 
-module.exports.bootstrap = function(cb) {
+var lodash = require('lodash');
 
-  // It's very important to trigger this callback method when you are finished
-  // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-  cb();
+module.exports.bootstrap = function(cb) {
+	// Merge new lodash features into sails internal lodash
+	_.defaults(_, lodash);
+	
+	// It's very important to trigger this callback method when you are finished
+	// with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
+	cb();
 };
