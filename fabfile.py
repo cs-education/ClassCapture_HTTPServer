@@ -1,4 +1,7 @@
 from fabric.api import env, local, run, cd, sudo, open_shell, settings
+from fabric.operations import prompt
+from fabric.contrib.files import append
+
 
 # Notes on setting up server before running this fabfile:
 #   Must install node (which comes with npm) and git, and pm2 from npm
@@ -34,9 +37,26 @@ def checkout():
         must_clone_repo = run("test -d %s" % git_repo_name).failed
     if must_clone_repo:
         run("git clone %s%s.git" % (git_base_url, git_repo_name))
+
     with cd("~/%s" % git_repo_name):
         run("git pull origin master")
         run("npm install") # install package dependencies
+
+    if must_clone_repo:
+        write_env() # write the .env file which will contain all sensitive data regarding database connection
+
+def write_env():
+    print "Must write vars to '.env' file"
+    # Defaults are for development vm
+    prompt('DB_HOST=', 'DB_HOST', default='localhost')
+    prompt('DB_USER=', 'DB_USER', default='vmuser')
+    prompt('DB_PASSWORD=', 'DB_PASSWORD', default='freshhook19')
+    prompt('DB_NAME=', 'DB_NAME', default='classcapture')
+    env_kv_list = ["DB_HOST=%s" % env.DB_HOST, "DB_USER=%s" % env.DB_USER, "DB_PASSWORD=%s" % env.DB_PASSWORD, "DB_NAME=%s" % env.DB_NAME]
+    with cd("~/%s" % git_repo_name):
+        run("touch .env")
+        append(".env", env_kv_list) # add all lines to the .env file
+        run("cat .env")
 
 def start_server():
     """

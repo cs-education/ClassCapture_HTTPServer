@@ -19,6 +19,11 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.connections.html
  */
 
+var dotenv = require('dotenv');
+
+// Sets up environment vars from '.env' file in project root directory
+dotenv.config();
+
 module.exports.connections = {
 
   /***************************************************************************
@@ -76,10 +81,10 @@ module.exports.connections = {
   ***************************************************************************/
   postgresqlServer: {
     adapter: 'sails-postgresql',
-    host: 'localhost',
-    user: 'vmuser',
-    password: 'freshhook19',
-    database: 'classcapture',
+    host: process.env.DB_HOST, // these db related env vars are pulled from .env file in project's root dir 
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     poolSize: 1,
     schema: true
   }
