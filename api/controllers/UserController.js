@@ -25,7 +25,7 @@ module.exports = {
 			.exec((err, user) => {
 				if (err) {
 					res.negotiate(err);
-				} if (_.isUndefined(user)) {
+				} if (_.isUndefined(user) || user.password !== creds.password) {
 					res.negotiate(new StatusError(401, "Invalid Credentials"));
 				} else {
 					var cookie = AuthService.getUserCookie({
@@ -142,7 +142,9 @@ module.exports = {
 								res.negotiate(err);
 							} else if (_.isUndefined(user)) {
 								res.negotiate(new StatusError(404, `Couldn't locate user with ID ${updatedUser.id}`));
-							} else {
+              } else if (user.password !== currentPassword) {
+                res.negotiate(new StatusError(401, "Invalid Credentials"));
+              } else {
 								// Since the password may have changed, the cookies that the user has will no longer be valid
 								// Generate the cookie to be set on the client side cookie
 								var cookie = AuthService.getUserCookie(user);
