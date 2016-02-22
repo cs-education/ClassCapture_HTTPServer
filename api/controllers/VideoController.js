@@ -9,7 +9,7 @@ var path = require("path");
 var fs   = require('fs');
 var StatusError = require('statuserror');
 
-var MAX_FILE_SIZE = 500e6; // in bytes. 500 MB
+const MAX_FILE_SIZE = sails.config.maxVideoSizeBytes; // in bytes
 
 // Map from video name of a currently uploading video to Promise that is resolved upon upload completion
 // Entries must be deleted upon video upload completion

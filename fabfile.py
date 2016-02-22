@@ -15,9 +15,9 @@ from fabric.contrib.files import append
 
 env.user = ""
 env.password = ""
-env.hosts = ["classcapture1.cs.illinois.edu"]
+env.hosts = ["classcapture.ncsa.illinois.edu"]
 
-git_base_url = "https://github.com/cs-education/"
+git_base_url = "https://github.com/sourabhdesai/"
 git_repo_name = "ClassCapture_HTTPServer"
 videos_dir = "~/classcapture_videos"
 
@@ -56,7 +56,6 @@ def write_env():
     with cd("~/%s" % git_repo_name):
         run("touch .env")
         append(".env", env_kv_list) # add all lines to the .env file
-        run("cat .env")
 
 def start_server():
     """

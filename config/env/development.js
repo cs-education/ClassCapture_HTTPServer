@@ -22,6 +22,7 @@ module.exports = {
 	port: 8080,
 	jwtSecret: 'sup',
 	jwtExpiration: '1h',
+	maxVideoSizeBytes: 500e6, // 500 MB
 
 	// points to actual UIUC LDAP Server
 	ldapUrl: 'ldaps://ldap.illinois.edu'
