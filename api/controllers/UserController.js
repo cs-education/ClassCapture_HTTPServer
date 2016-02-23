@@ -133,8 +133,8 @@ module.exports = {
 						res.negotiate(err);
 					} else if (_.isUndefined(updatedUser)) {
 						res.negotiate(new StatusError(404, `Couldn't locate user with ID ${userID}`));
-          } else if (user.password !== currentPassword) {
-            res.negotiate(new StatusError(401, "Invalid Credentials"));
+					} else if (updatedUser.password !== currentPassword) {
+			            res.negotiate(new StatusError(401, "Invalid Credentials"));
 					} else {
 						// Must do one final find query to retrieve user data with updated fields
 						User.findOne(updatedUser.id)
