@@ -37,7 +37,7 @@ module.exports = {
 
   jwtSecret: 'hakunamatata1984',
   jwtExpiration: '20 days',
-  maxVideoSizeBytes: 2000e6, // 2 GB
+  maxVideoSizeBytes: 5000e6, // 5 GB
 
   // Points to actual UIUC LDAP Server
   ldapUrl: 'ldaps://ldap.illinois.edu'
